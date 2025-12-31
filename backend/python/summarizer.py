@@ -210,4 +210,3 @@ def summarize_to_crt(text):
 ==================================================
 """
     return summary
-
