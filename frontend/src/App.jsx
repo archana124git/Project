@@ -15,6 +15,7 @@ import PharmacyDashboard from './components/PharmacyDashboard.jsx';
 
 import ListeningPage from './components/ListeningPage';
 import ConsultationCompletion from './components/ConsultationCompletion';
+import PrescriptionView from './components/PrescriptionView.jsx';
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/patient/:patientId" element={<PatientDetails />} />
         <Route path="/listening" element={<ListeningPage />} />
         <Route path="/consultation" element={<ConsultationCompletion />} />
+        <Route path="/prescription/:prescriptionId" element={<PrescriptionView />} />
       </Routes>
     </BrowserRouter>
   );

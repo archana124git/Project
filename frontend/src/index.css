@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #prescription-print,
+  #prescription-print * {
+    visibility: visible;
+  }
+
+  #prescription-print {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+}

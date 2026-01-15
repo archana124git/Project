@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { ArrowLeft, Save, Pill, Plus, Trash2, User, FileText, CheckCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PrescriptionPreview from "../components/PrescriptionPreview";
@@ -23,6 +23,17 @@ export default function ConsultationCompletion() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  //pop up message
+  useEffect(() => {
+  if (!showSuccess) return;
+
+  const timer = setTimeout(() => {
+    setShowSuccess(false);
+  }, 3000); // popup disappears after 3 seconds
+
+  return () => clearTimeout(timer);
+}, [showSuccess]);
+
 
   const [formData, setFormData] = useState({
     diagnosis: "",
@@ -165,7 +176,7 @@ export default function ConsultationCompletion() {
         throw new Error("Failed to save diagnosis");
       }
 
-      const prescriptionRes = await fetch("http://localhost:5000/prescriptions", {
+      const prescriptionRes = await fetch("http://localhost:5000/api/prescriptions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -259,7 +270,7 @@ export default function ConsultationCompletion() {
         {editableSummary && (
         <div className="bg-green-50 p-6 border rounded mb-6">
           <h2 className="font-bold flex items-center space-x-2 mb-2">
-            <FileText className="w-5 h-5" /> AI Summarisation (CRT)
+            <FileText className="w-5 h-5" />  Summarisation (CRT)
           </h2>
 
           <textarea
@@ -521,28 +532,33 @@ export default function ConsultationCompletion() {
         </form>
           {/* Prescription Preview */}
           {showPreview && (
-            <div className="mt-10">
+  <div className="mt-10">
 
-              <PrescriptionPreview data={prescriptionData} />
+    {/* PRINT AREA */}
+    <div id="prescription-print">
+      <PrescriptionPreview data={prescriptionData} />
+    </div>
 
-              <div className="flex justify-end mt-4 space-x-3">
-                <button
-                  onClick={() => window.print()}
-                  className="px-5 py-2 bg-green-600 text-white rounded"
-                >
-                  Print Prescription
-                </button>
+    {/* Buttons - should NOT print */}
+    <div className="flex justify-end mt-4 space-x-3 no-print">
+      <button
+        onClick={() => window.print()}
+        className="px-5 py-2 bg-green-600 text-white rounded"
+      >
+        Print Prescription
+      </button>
 
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="px-5 py-2 bg-blue-600 text-white rounded"
-                >
-                  Back to Dashboard
-                </button>
-              </div>
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="px-5 py-2 bg-blue-600 text-white rounded"
+      >
+        Back to Dashboard
+      </button>
+    </div>
 
-            </div>
-          )}
+  </div>
+)}
+
       </main>
 
     </div>

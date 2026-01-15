@@ -28,9 +28,9 @@ export default function DoctorDashboard() {
   // Stats placeholder
   const [stats] = useState({
     total_appointments_today: 8,
-    completed_appointments: 3,
-    pending_appointments: 4,
-    in_progress_appointments: 1,
+    completed_appointments: 0,
+    pending_appointments: 0,
+    in_progress_appointments: 0,
   });
 
   /* ------------------------------------------------

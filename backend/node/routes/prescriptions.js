@@ -19,15 +19,10 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Missing data" });
     }
 
-    // 1️⃣ Create prescription
     const { data: prescription, error: presError } = await supabase
       .from("prescriptions")
       .insert([
-        {
-          doctor_id,
-          patient_id,
-          status: "final"
-        }
+        { doctor_id, patient_id, status: "final" }
       ])
       .select()
       .single();
@@ -37,7 +32,6 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(500).json({ error: "Failed to create prescription" });
     }
 
-    // 2️⃣ Insert medicines
     const rows = medicines.map(m => ({
       prescription_id: prescription.prescription_id,
       medicine_id: m.medicine_id,
@@ -56,9 +50,7 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(500).json({ error: "Failed to save medicines" });
     }
 
-    return res.status(201).json({
-      prescription_id: prescription.prescription_id
-    });
+    res.status(201).json({ prescription_id: prescription.prescription_id });
 
   } catch (err) {
     console.error("PRESCRIPTION ERROR:", err);
@@ -66,4 +58,62 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-export default router;
+/* ============================================================================
+   GET PRESCRIPTIONS BY PATIENT ID
+============================================================================ */
+router.get("/patient/:patientId", authMiddleware, async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const limit = Number(req.query.limit) || 4;
+
+    const { data, error } = await supabase
+      .from("prescriptions")
+      .select(`
+        prescription_id,
+        created_at,
+        status,
+        doctor_id
+      `)
+      .eq("patient_id", patientId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error("FETCH PRESCRIPTIONS ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+/* ============================================================================
+   GET PRESCRIPTION BY ID
+============================================================================ */
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: prescription, error: presError } = await supabase
+      .from("prescriptions")
+      .select(`*, prescription_medicine(*)`)
+      .eq("prescription_id", id)
+      .single();
+
+    if (presError) {
+      console.error(presError);
+      return res.status(404).json({ error: "Prescription not found" });
+    }
+
+    res.json(prescription);
+  } catch (err) {
+    console.error("FETCH PRESCRIPTION BY ID ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+export default router;   // ✅ ALWAYS LAST

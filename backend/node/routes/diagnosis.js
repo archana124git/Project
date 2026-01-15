@@ -90,29 +90,56 @@ router.get("/search", authMiddleware, async (req, res) => {
 /* ============================================================================
    GET DIAGNOSIS (DECRYPTED)
 ============================================================================ */
-router.get("/:summary_id", authMiddleware, async (req, res) => {
+/* ============================================================================
+   GET ALL DIAGNOSES FOR A PATIENT (DECRYPTED)
+============================================================================ */
+router.get("/patient/:patientId", authMiddleware, async (req, res) => {
   try {
-    const { summary_id } = req.params;
+    const { patientId } = req.params;
 
-    const { data, error } = await supabase
+    // 1️⃣ Conversations
+    const { data: conversations, error: cErr } = await supabase
+      .from("conversations")
+      .select("convo_id")
+      .eq("patient_id", patientId);
+
+    if (cErr) throw cErr;
+    if (!conversations.length) return res.json([]);
+
+    const convoIds = conversations.map(c => c.convo_id);
+
+    // 2️⃣ Clinical summaries
+    const { data: summaries, error: sErr } = await supabase
+      .from("clinical_summaries")
+      .select("summary_id, created_at")
+      .in("convo_id", convoIds);
+
+    if (sErr) throw sErr;
+    if (!summaries.length) return res.json([]);
+
+    const summaryIds = summaries.map(s => s.summary_id);
+
+    // 3️⃣ Diagnosis
+    const { data: diagnoses, error: dErr } = await supabase
       .from("diagnosis")
-      .select("disease_name_encrypted")
-      .eq("summary_id", summary_id)
-      .single();
+      .select("diagnosis_id, disease_name_encrypted, created_at, summary_id")
+      .in("summary_id", summaryIds)
+      .order("created_at", { ascending: false });
 
-    if (error || !data) {
-      return res.status(404).json({ error: "Diagnosis not found" });
-    }
+    if (dErr) throw dErr;
 
-    const decryptedDiagnosis = decryptDiagnosis(
-      data.disease_name_encrypted
-    );
+    // 4️⃣ Decrypt
+    const result = diagnoses.map(d => ({
+      diagnosis_id: d.diagnosis_id,
+      created_at: d.created_at,
+      disease_name: decryptDiagnosis(d.disease_name_encrypted),
+    }));
 
-    return res.json({ diagnosis: decryptedDiagnosis });
+    return res.json(result);
   } catch (err) {
-    console.error("FETCH DIAGNOSIS ERROR:", err);
+    console.error("FETCH PATIENT DIAGNOSES ERROR:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });
 
-export default router;
+export default router;    

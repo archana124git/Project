@@ -33,9 +33,13 @@ export default function Login() {
       localStorage.setItem("role", data.role);
   
       // Navigate based on user role
-      if (role.toLowerCase() === "doctor") navigate("/dashboard");
-      else if (role.toLowerCase() === "admin") navigate("/admin-dashboard");
-      else navigate("/"); // fallback
+      if (role.toLowerCase() === "doctor") {
+      navigate("/dashboard", { replace: true });
+    } else if (role.toLowerCase() === "admin") {
+      navigate("/admin-dashboard", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    } // fallback
     } catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please try again.");
