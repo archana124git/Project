@@ -5,8 +5,9 @@ import supabase from "../supabaseClient";
 export default function PatientDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
+const patientId = location.state?.patient?.patient_id || localStorage.getItem("patient_id");
 
-  const patientId = location.state?.patient?.patient_id;
+ 
 
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -153,18 +154,18 @@ export default function PatientDashboard() {
               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
               </svg>
-              Emergency: 911
+              
             </span>
             <span className="flex items-center">
               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
               </svg>
-              info@cityhospital.com
+              
             </span>
           </div>
           <div className="flex items-center space-x-4">
-            <span>📍 123 Medical Center Dr, City, State</span>
+           
           </div>
         </div>
       </div>
@@ -183,7 +184,7 @@ export default function PatientDashboard() {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">City Hospital</h1>
+          
                   <p className="text-xs text-gray-500 uppercase tracking-wide">Patient Portal</p>
                 </div>
               </div>
@@ -242,14 +243,13 @@ export default function PatientDashboard() {
             {/* Page Header */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome back, {patient.name}</h2>
-              <p className="text-gray-600">Here's your health dashboard overview</p>
+              
             </div>
 
             <div className="grid lg:grid-cols-12 gap-6">
-                
-              {/* Left Sidebar - Patient Info */}
+
+              {/* Left Sidebar */}
               <div className="lg:col-span-4 space-y-6">
-                  
                 {/* Patient Profile Card */}
                 <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="border-b border-gray-200 px-6 py-4 bg-gradient-to-r from-blue-50 to-white">
@@ -287,6 +287,10 @@ export default function PatientDashboard() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Right Content */}
+              <div className="lg:col-span-8 space-y-6">
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 gap-4">
@@ -310,10 +314,7 @@ export default function PatientDashboard() {
                   </div>
                 </div>
 
-              </div>
-
-              {/* Right Content - Booking */}
-              <div className="lg:col-span-8">
+                {/* Book Appointment */}
                 <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
                   <div className="border-b border-gray-200 px-6 py-4 bg-gradient-to-r from-green-50 to-white">
                     <h3 className="font-semibold text-gray-900 flex items-center">
@@ -411,7 +412,7 @@ export default function PatientDashboard() {
                                 {/* Selected Doctor Info */}
                                 <div className="bg-white rounded-lg p-3 border border-blue-200">
                                   <p className="text-xs text-gray-600 mb-1">Consulting with</p>
-                                  <p className="font-semibold text-gray-900">Dr. {selectedDoctor.name}</p>
+                                  <p className="font-semibold text-gray-900"> {selectedDoctor.name}</p>
                                   <p className="text-xs text-gray-600">{selectedDoctor.specialization}</p>
                                 </div>
 
@@ -473,6 +474,7 @@ export default function PatientDashboard() {
 
                   </div>
                 </div>
+
               </div>
 
             </div>
@@ -541,44 +543,7 @@ export default function PatientDashboard() {
 
       </main>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="bg-gray-900 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="font-semibold mb-3">City Hospital</h4>
-              <p className="text-sm text-gray-400">Providing quality healthcare services since 1985</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Quick Links</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white">About Us</a></li>
-                <li><a href="#" className="hover:text-white">Our Doctors</a></li>
-                <li><a href="#" className="hover:text-white">Services</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Patient Resources</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white">FAQs</a></li>
-                <li><a href="#" className="hover:text-white">Insurance</a></li>
-                <li><a href="#" className="hover:text-white">Billing</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Contact</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>📞 (555) 123-4567</li>
-                <li>📧 info@cityhospital.com</li>
-                <li>📍 123 Medical Center Dr</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-6 text-center text-sm text-gray-400">
-            <p>&copy; 2026 City Hospital. All rights reserved. | <a href="#" className="hover:text-white">Privacy Policy</a> | <a href="#" className="hover:text-white">Terms of Service</a></p>
-          </div>
-        </div>
-      </footer>
+      
 
     </div>
   );

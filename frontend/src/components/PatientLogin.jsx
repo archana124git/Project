@@ -1,117 +1,141 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import supabase from "../supabaseClient";
 
 function PatientLogin() {
+  const [patientId, setPatientId] = useState("");
   const [mobile, setMobile] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSendOTP = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Basic mobile validation
+    if (!patientId.trim()) {
+      setError("Please enter your Patient ID");
+      return;
+    }
+
     if (!/^[6-9]\d{9}$/.test(mobile)) {
       setError("Please enter a valid 10-digit mobile number");
       return;
     }
 
-    // Mock OTP flow (NO backend change)
-    localStorage.setItem("patient_mobile", mobile);
-    localStorage.setItem("patient_otp", "123456");
+    // ✅ Format mobile with +91 to match database format
+    const formattedMobile = "+91" + mobile;
 
-    navigate("/patient/verify-otp");
+    // ✅ Fetch patient from Supabase to validate login
+    const { data, error: dbError } = await supabase
+      .from("patients")
+      .select("patient_id, name, age, gender, contact")
+      .eq("patient_id", patientId)
+      .eq("contact", formattedMobile)
+      .single();
+
+    if (dbError || !data) {
+      setError("Invalid Patient ID or Mobile Number");
+      return;
+    }
+
+    // Save patient info in localStorage (optional, helps on page refresh)
+    localStorage.setItem("patient_id", data.patient_id);
+    localStorage.setItem("contact", data.contact);
+
+    // ✅ Navigate to dashboard and pass patient data in state
+    navigate("/patient/dashboard", {
+      state: {
+        patient: data
+      }
+    });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md">
-        
-        {/* Logo/Brand Section */}
+
+        {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-800 rounded-lg mb-4">
+            <span className="text-white font-semibold text-lg">AP</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Patient Portal</h1>
-          <p className="text-sm text-gray-600 mt-1">Secure access to your health records</p>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Patient Access Portal
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Andhra Pradesh Health Management System
+          </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">
-              Sign In
-            </h2>
-            <p className="text-sm text-gray-600">
-              Enter your mobile number to receive an OTP
-            </p>
-          </div>
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">
+            Registered Patient Login
+          </h2>
 
-          <form onSubmit={handleSendOTP} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mobile Number
+                Patient ID
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <span className="text-gray-500 text-sm">+91</span>
-                </div>
-                <input
-                  type="tel"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                  placeholder="9876543210"
-                  maxLength={10}
-                  className="w-full pl-14 pr-4 py-3 rounded-lg border border-gray-300 text-gray-900
-                           placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
-                           focus:border-transparent transition-all"
-                  required
-                />
-              </div>
-              <p className="mt-1.5 text-xs text-gray-500">We'll send you a 6-digit verification code</p>
+              <input
+                type="text"
+                value={patientId}
+                onChange={(e) => setPatientId(e.target.value)}
+                placeholder="Enter your Patient ID"
+                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Registered Mobile Number
+              </label>
+              <input
+                type="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                placeholder="Enter 10-digit mobile number"
+                maxLength={10}
+                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent transition-all"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Must match the mobile number registered during patient registration
+              </p>
             </div>
 
             {error && (
-              <div className="flex items-start gap-2 p-3 text-sm text-red-700 bg-red-50
-                            border border-red-200 rounded-lg">
-                <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span>{error}</span>
+              <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md p-3">
+                {error}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg font-medium text-white
-                       bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 
-                       focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="w-full py-3 px-4 rounded-md font-medium text-white bg-gray-800 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition-colors"
             >
-              Send OTP
+              Login
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="mt-6 text-center">
             <Link
               to="/"
-              className="flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to Staff Login
+              ← Back to Portal
             </Link>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
-            Protected by industry-standard encryption
+            This system is developed as part of an academic project under AP State Health Services.
           </p>
         </div>
+
       </div>
     </div>
   );

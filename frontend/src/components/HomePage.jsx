@@ -71,7 +71,7 @@ function HomePage() {
           <span className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></span>
         </Link>
         <Link
-  to="/patient/login"
+  to="/patient"
   className="group relative px-6 py-2.5 text-sm font-semibold text-white/90 hover:text-white transition-all duration-300"
 >
   <span className="relative z-10">Patient Login</span>

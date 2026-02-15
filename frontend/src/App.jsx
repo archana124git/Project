@@ -17,7 +17,7 @@ import ListeningPage from './components/ListeningPage';
 import ConsultationCompletion from './components/ConsultationCompletion';
 import PrescriptionView from './components/PrescriptionView.jsx';
 import PatientLogin from './components/Patientlogin.jsx';
-import PatientVerifyOtp from './components/PatientVerifyOtp';
+import PatientAccess from './components/PatientAccess.jsx';
 import PatientRegister from "./components/PatientRegister";
 import PatientDashboard from "./components/PatientDashboard";
 export default function App() {
@@ -37,9 +37,9 @@ export default function App() {
         
         <Route path="/dashboard" element={<DoctorDashboard />} />
         <Route path="/patient/login" element={<PatientLogin />} />
-        <Route path="/patient/verify-otp" element={<PatientVerifyOtp />} />
+        <Route path="/patient" element={<PatientAccess />} />
         <Route path="/patient/register" element={<PatientRegister />} />
-        <Route path="/patient-dashboard" element={<PatientDashboard />} />
+        <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/patient/:patientId" element={<PatientDetails />} />
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/patient/:patientId" element={<PatientDetails />} />
