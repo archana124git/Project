@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PrescriptionPreview from "./PrescriptionPreview";
+import html2pdf from "html2pdf.js";
 
 export default function PrescriptionView() {
   const { prescriptionId } = useParams();

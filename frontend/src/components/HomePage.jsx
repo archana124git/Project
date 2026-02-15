@@ -61,7 +61,8 @@ function HomePage() {
       </div>
 
       {/* Top Navigation */}
-      <div className="absolute top-8 right-8 z-20">
+      <div className="absolute top-8 right-8 z-20 flex gap-3">
+
         <Link
           to="/admin-login"
           className="group relative px-6 py-2.5 text-sm font-semibold text-white/90 hover:text-white transition-all duration-300"
@@ -69,6 +70,14 @@ function HomePage() {
           <span className="relative z-10">Admin Login</span>
           <span className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></span>
         </Link>
+        <Link
+  to="/patient/login"
+  className="group relative px-6 py-2.5 text-sm font-semibold text-white/90 hover:text-white transition-all duration-300"
+>
+  <span className="relative z-10">Patient Login</span>
+  <span className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></span>
+</Link>
+
       </div>
 
       {/* Main Section */}
@@ -125,16 +134,7 @@ function HomePage() {
                 </ol>
               </div>
 
-              <div className="flex gap-4 pt-4">
-                <div className="stat-badge">
-                  <div className="text-2xl font-bold">50K+</div>
-                  <div className="text-xs text-blue-200">Active Users</div>
-                </div>
-                <div className="stat-badge">
-                  <div className="text-2xl font-bold">99.9%</div>
-                  <div className="text-xs text-blue-200">Uptime</div>
-                </div>
-              </div>
+              
             </div>
           </div>
 

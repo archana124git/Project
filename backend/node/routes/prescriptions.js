@@ -19,6 +19,12 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Missing data" });
     }
 
+    // Validate that all medicines have required fields
+    const invalidMedicines = medicines.filter(m => !m.medicine_id || !m.dosage || !m.frequency || !m.duration);
+    if (invalidMedicines.length > 0) {
+      return res.status(400).json({ error: "All medicines must have medicine_id, dosage, frequency, and duration" });
+    }
+
     const { data: prescription, error: presError } = await supabase
       .from("prescriptions")
       .insert([

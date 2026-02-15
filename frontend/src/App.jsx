@@ -16,7 +16,10 @@ import PharmacyDashboard from './components/PharmacyDashboard.jsx';
 import ListeningPage from './components/ListeningPage';
 import ConsultationCompletion from './components/ConsultationCompletion';
 import PrescriptionView from './components/PrescriptionView.jsx';
-
+import PatientLogin from './components/Patientlogin.jsx';
+import PatientVerifyOtp from './components/PatientVerifyOtp';
+import PatientRegister from "./components/PatientRegister";
+import PatientDashboard from "./components/PatientDashboard";
 export default function App() {
   return (
     <BrowserRouter>
@@ -33,11 +36,18 @@ export default function App() {
         <Route path="/pharmacy-dashboard" element={<PharmacyDashboard />} />
         
         <Route path="/dashboard" element={<DoctorDashboard />} />
+        <Route path="/patient/login" element={<PatientLogin />} />
+        <Route path="/patient/verify-otp" element={<PatientVerifyOtp />} />
+        <Route path="/patient/register" element={<PatientRegister />} />
+        <Route path="/patient-dashboard" element={<PatientDashboard />} />
+        <Route path="/patient/:patientId" element={<PatientDetails />} />
+        <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/patient/:patientId" element={<PatientDetails />} />
         <Route path="/listening" element={<ListeningPage />} />
         <Route path="/consultation" element={<ConsultationCompletion />} />
         <Route path="/prescription/:prescriptionId" element={<PrescriptionView />} />
+        
       </Routes>
     </BrowserRouter>
   );
-}
+}   
