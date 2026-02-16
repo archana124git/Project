@@ -1,210 +1,231 @@
-import React, { useEffect, useState } from "react";
-import {
-  Package,
-  AlertCircle,
-  ClipboardList,
-  LogOut,
-} from "lucide-react";
-import supabase from "../supabaseClient";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { Search, Package, AlertCircle, CheckCircle, Plus, Edit2, Trash2, X, Activity, TrendingDown, FileText, ClipboardList, User, Calendar, Pill } from 'lucide-react';
 
 export default function PharmacyDashboard() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("inventory");
+  const [userRole, setUserRole] = useState('pharmacist');
+  const [activeTab, setActiveTab] = useState('inventory');
+  const [medicines, setMedicines] = useState([
+    { id: 1, name: 'Paracetamol 500mg', category: 'Analgesic', stock: 250, minStock: 50, price: 5.00, available: true, expiryDate: '2025-12-30' },
+    { id: 2, name: 'Amoxicillin 500mg', category: 'Antibiotic', stock: 120, minStock: 30, price: 15.00, available: true, expiryDate: '2025-08-15' },
+    { id: 3, name: 'Ibuprofen 400mg', category: 'Analgesic', stock: 0, minStock: 50, price: 8.00, available: false, expiryDate: '2026-01-20' },
+    { id: 4, name: 'Metformin 500mg', category: 'Antidiabetic', stock: 180, minStock: 40, price: 12.00, available: true, expiryDate: '2025-11-10' },
+    { id: 5, name: 'Lisinopril 10mg', category: 'Antihypertensive', stock: 15, minStock: 30, price: 20.00, available: true, expiryDate: '2025-09-25' },
+    { id: 6, name: 'Omeprazole 20mg', category: 'Proton Pump Inhibitor', stock: 95, minStock: 25, price: 10.00, available: true, expiryDate: '2026-03-18' },
+  ]);
+  
+  const [prescriptions, setPrescriptions] = useState([
+    {
+      id: 1,
+      prescriptionNo: 'RX-2024-001',
+      patientName: 'John Doe',
+      patientAge: 45,
+      doctorName: 'Dr. Sarah Williams',
+      date: '2024-12-20',
+      status: 'pending',
+      medicines: [
+        { medicineId: 1, medicineName: 'Paracetamol 500mg', dosage: '1 tablet', frequency: 'Three times daily', duration: '5 days', quantity: 15 },
+        { medicineId: 2, medicineName: 'Amoxicillin 500mg', dosage: '1 tablet', frequency: 'Twice daily', duration: '7 days', quantity: 14 }
+      ],
+      notes: 'Take after meals'
+    },
+    {
+      id: 2,
+      prescriptionNo: 'RX-2024-002',
+      patientName: 'Emma Smith',
+      patientAge: 32,
+      doctorName: 'Dr. Michael Chen',
+      date: '2024-12-19',
+      status: 'fulfilled',
+      medicines: [
+        { medicineId: 4, medicineName: 'Metformin 500mg', dosage: '1 tablet', frequency: 'Once daily', duration: '30 days', quantity: 30 }
+      ],
+      notes: 'Take with breakfast'
+    },
+    {
+      id: 3,
+      prescriptionNo: 'RX-2024-003',
+      patientName: 'Robert Johnson',
+      patientAge: 58,
+      doctorName: 'Dr. Sarah Williams',
+      date: '2024-12-21',
+      status: 'pending',
+      medicines: [
+        { medicineId: 5, medicineName: 'Lisinopril 10mg', dosage: '1 tablet', frequency: 'Once daily', duration: '30 days', quantity: 30 },
+        { medicineId: 3, medicineName: 'Ibuprofen 400mg', dosage: '1 tablet', frequency: 'As needed', duration: '10 days', quantity: 10 }
+      ],
+      notes: 'Monitor blood pressure regularly'
+    }
+  ]);
 
-  // ================= INVENTORY =================
-  const [inventory] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [editingMedicine, setEditingMedicine] = useState(null);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    category: '',
+    stock: '',
+    minStock: '',
+    price: '',
+    expiryDate: ''
+  });
 
-  // ================= PRESCRIPTIONS =================
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [prescriptionForm, setPrescriptionForm] = useState({
+    patientName: '',
+    patientAge: '',
+    doctorName: '',
+    medicines: [{ medicineId: '', dosage: '', frequency: '', duration: '', quantity: '' }],
+    notes: ''
+  });
 
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
+  const filteredMedicines = medicines.filter(med =>
+    med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    med.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const [searchText, setSearchText] = useState("");
+  const filteredPrescriptions = prescriptions.filter(pres =>
+    pres.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pres.prescriptionNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pres.doctorName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // ================= LOGOUT =================
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/", { replace: true });
+  const handleAddMedicine = () => {
+    if (formData.name && formData.category && formData.stock && formData.price) {
+      const newMedicine = {
+        id: medicines.length + 1,
+        name: formData.name,
+        category: formData.category,
+        stock: parseInt(formData.stock),
+        minStock: parseInt(formData.minStock) || 20,
+        price: parseFloat(formData.price),
+        expiryDate: formData.expiryDate || '2026-12-31',
+        available: parseInt(formData.stock) > 0
+      };
+      setMedicines([...medicines, newMedicine]);
+      setFormData({ name: '', category: '', stock: '', minStock: '', price: '', expiryDate: '' });
+      setShowAddModal(false);
+    }
   };
 
-  // ================= FETCH =================
-  useEffect(() => {
-    fetchPrescriptions(selectedDate);
-  }, [selectedDate]);
-
-  async function fetchPrescriptions(date) {
-    setLoading(true);
-
-    try {
-      const start = `${date}T00:00:00`;
-      const end = `${date}T23:59:59`;
-
-      // 1️⃣ Prescriptions
-      const { data: presData, error: presError } = await supabase
-        .from("prescriptions")
-        .select("prescription_id, patient_id, created_at")
-        .gte("created_at", start)
-        .lte("created_at", end)
-        .order("created_at", { ascending: false });
-
-      if (presError) throw presError;
-
-      if (!presData || presData.length === 0) {
-        setPrescriptions([]);
-        setLoading(false);
-        return;
-      }
-
-      // 2️⃣ Patients insurance - fetch from backend API to bypass RLS restrictions
-      const patientIds = [...new Set(presData.map(p => p.patient_id))];
-      
-      const token = localStorage.getItem("token");
-      let patientData = [];
-      
-      try {
-        // Fetch all patients from backend (which uses admin client, no RLS)
-        const patientsRes = await axios.get(
-          `http://localhost:5000/patients`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        const allPatients = patientsRes.data?.patients || [];
-        console.log("All patients from backend:", allPatients);
-        
-        // Filter to only the patients in our prescriptions
-        patientData = allPatients.filter(p => patientIds.includes(p.patient_id));
-        console.log("Filtered patients with insurance data:", patientData);
-      } catch (err) {
-        console.error("Failed to fetch patients from backend:", err);
-        // Fallback to direct Supabase query
-        const { data, error } = await supabase
-          .from("patients")
-          .select("*")
-          .in("patient_id", patientIds);
-        
-        if (error) {
-          console.error("Patient fetch error:", error);
-          throw error;
-        }
-        patientData = data || [];
-      }
-
-      // ✅ NORMALIZED MAP
-        const patientMap = {};
-        const patientDataArr = patientData || [];
-        // debug: log full patient data to see all columns returned
-        console.log("Full patientData (all columns):", patientDataArr);
-        if (patientDataArr.length > 0) {
-          console.log("Sample patient keys:", Object.keys(patientDataArr[0]));
-        }
-        patientDataArr.forEach(p => {
-          // store under both original and string key to avoid type mismatches
-          patientMap[p.patient_id] = p;
-          patientMap[String(p.patient_id)] = p;
-        });
-
-      // 3️⃣ Prescription medicines
-      const prescriptionIds = presData.map(p => p.prescription_id);
-
-      const { data: pmData, error: pmError } = await supabase
-        .from("prescription_medicine")
-        .select("prescription_id, medicine_id, dosage, frequency")
-        .in("prescription_id", prescriptionIds);
-
-      if (pmError) throw pmError;
-
-      // 4️⃣ Medicine names
-      const medicineIds = [...new Set(pmData.map(m => m.medicine_id))];
-
-      const { data: medicines } = await supabase
-        .from("medicine")
-        .select("medicine_id, name")
-        .in("medicine_id", medicineIds);
-
-      const medicineMap = {};
-      medicines.forEach(m => (medicineMap[m.medicine_id] = m.name));
-
-      // 5️⃣ Diagnosis
-      const finalData = await Promise.all(
-        presData.map(async p => {
-          let diagnosis = "Not Available";
-          try {
-            const res = await axios.get(
-              `http://localhost:5000/diagnosis/patient/${p.patient_id}`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-            diagnosis = res.data?.[0]?.disease_name || diagnosis;
-          } catch {}
-
-          // Lookup patient entry by the original patient_id (no case transform)
-          const patientEntry = patientMap[p.patient_id] || patientMap[String(p.patient_id)];
-
-          // try multiple possible field names as fallbacks
-          const rawType =
-            patientEntry?.insurance_type ?? patientEntry?.insuranceType ?? patientEntry?.insurance ?? null;
-          const rawStatus =
-            patientEntry?.insurance_status ?? patientEntry?.insuranceStatus ?? patientEntry?.status ?? null;
-
-            // ✅ NORMALIZE INSURANCE (robust to casing and empty values)
-            const hasValidType =
-              rawType && String(rawType).trim() !== "" && String(rawType).toUpperCase() !== "NONE";
-
-            const insurance_type = hasValidType ? rawType : null;
-
-            const insurance_status =
-              insurance_type && rawStatus
-                ? (typeof rawStatus === "string"
-                    ? rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1)
-                    : rawStatus)
-                : null;
-
-            // debug resolved values per prescription
-            console.debug("resolved insurance for patient", p.patient_id, {
-              rawType,
-              rawStatus,
-              insurance_type,
-              insurance_status,
-            });
-
-          return {
-            prescription_id: p.prescription_id,
-            patient_id: p.patient_id,
-            visited_at: p.created_at,
-            diagnosis,
-            insurance_type,
-            insurance_status,
-            patient_raw: patientEntry || null,
-            medicines: pmData
-              .filter(m => m.prescription_id === p.prescription_id)
-              .map(m => ({
-                name: medicineMap[m.medicine_id] || "Unknown",
-                dosage: m.dosage,
-                frequency: m.frequency,
-              })),
-          };
-        })
-      );
-
-      setPrescriptions(finalData);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setPrescriptions([]);
-    } finally {
-      setLoading(false);
+  const handleUpdateMedicine = () => {
+    if (editingMedicine && formData.name && formData.category && formData.stock && formData.price) {
+      setMedicines(medicines.map(med => 
+        med.id === editingMedicine.id 
+          ? {
+              ...med,
+              name: formData.name,
+              category: formData.category,
+              stock: parseInt(formData.stock),
+              minStock: parseInt(formData.minStock) || 20,
+              price: parseFloat(formData.price),
+              expiryDate: formData.expiryDate || '2026-12-31',
+              available: parseInt(formData.stock) > 0
+            }
+          : med
+      ));
+      setEditingMedicine(null);
+      setFormData({ name: '', category: '', stock: '', minStock: '', price: '', expiryDate: '' });
     }
-  }
+  };
 
-  const filteredPrescriptions = prescriptions.filter(p =>
-    p.patient_id.toString().includes(searchText)
-  );
+  const handleDeleteMedicine = (id) => {
+    if (window.confirm('Are you sure you want to delete this medicine?')) {
+      setMedicines(medicines.filter(med => med.id !== id));
+    }
+  };
 
-  const lowStockCount = inventory.filter(i => i.quantity < 10).length;
-  const patientsCount = prescriptions.length;
+  const handleEditClick = (medicine) => {
+    setEditingMedicine(medicine);
+    setFormData({
+      name: medicine.name,
+      category: medicine.category,
+      stock: medicine.stock.toString(),
+      minStock: medicine.minStock.toString(),
+      price: medicine.price.toString(),
+      expiryDate: medicine.expiryDate
+    });
+  };
+
+  const handleAddPrescription = () => {
+    if (prescriptionForm.patientName && prescriptionForm.doctorName) {
+      const newPrescription = {
+        id: prescriptions.length + 1,
+        prescriptionNo: `RX-2024-${(prescriptions.length + 1).toString().padStart(3, '0')}`,
+        patientName: prescriptionForm.patientName,
+        patientAge: parseInt(prescriptionForm.patientAge),
+        doctorName: prescriptionForm.doctorName,
+        date: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        medicines: prescriptionForm.medicines.filter(m => m.medicineId).map(m => ({
+          ...m,
+          medicineName: medicines.find(med => med.id === parseInt(m.medicineId))?.name || '',
+          quantity: parseInt(m.quantity)
+        })),
+        notes: prescriptionForm.notes
+      };
+      setPrescriptions([newPrescription, ...prescriptions]);
+      setPrescriptionForm({
+        patientName: '',
+        patientAge: '',
+        doctorName: '',
+        medicines: [{ medicineId: '', dosage: '', frequency: '', duration: '', quantity: '' }],
+        notes: ''
+      });
+      setShowPrescriptionModal(false);
+    }
+  };
+
+  const handleFulfillPrescription = (prescriptionId) => {
+    const prescription = prescriptions.find(p => p.id === prescriptionId);
+    if (prescription) {
+      const canFulfill = prescription.medicines.every(med => {
+        const medicine = medicines.find(m => m.id === med.medicineId);
+        return medicine && medicine.stock >= med.quantity;
+      });
+
+      if (canFulfill) {
+        prescription.medicines.forEach(med => {
+          setMedicines(medicines.map(m => 
+            m.id === med.medicineId 
+              ? { ...m, stock: m.stock - med.quantity, available: (m.stock - med.quantity) > 0 }
+              : m
+          ));
+        });
+        setPrescriptions(prescriptions.map(p =>
+          p.id === prescriptionId ? { ...p, status: 'fulfilled' } : p
+        ));
+        alert('Prescription fulfilled successfully!');
+      } else {
+        alert('Cannot fulfill prescription. Some medicines are out of stock or insufficient quantity.');
+      }
+    }
+  };
+
+  const addMedicineToPrescription = () => {
+    setPrescriptionForm({
+      ...prescriptionForm,
+      medicines: [...prescriptionForm.medicines, { medicineId: '', dosage: '', frequency: '', duration: '', quantity: '' }]
+    });
+  };
+
+  const updatePrescriptionMedicine = (index, field, value) => {
+    const updatedMedicines = [...prescriptionForm.medicines];
+    updatedMedicines[index][field] = value;
+    setPrescriptionForm({ ...prescriptionForm, medicines: updatedMedicines });
+  };
+
+  const removePrescriptionMedicine = (index) => {
+    setPrescriptionForm({
+      ...prescriptionForm,
+      medicines: prescriptionForm.medicines.filter((_, i) => i !== index)
+    });
+  };
+
+  const availableCount = medicines.filter(m => m.available).length;
+  const outOfStockCount = medicines.filter(m => !m.available).length;
+  const lowStockCount = medicines.filter(m => m.available && m.stock <= m.minStock).length;
+  const pendingPrescriptions = prescriptions.filter(p => p.status === 'pending').length;
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -15,8 +15,10 @@ const app = express();
 
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174"],
-  credentials: true
+  credentials: true,
+  
 }));
+
 
 app.use(express.json());
 
@@ -32,3 +34,4 @@ app.use("/diagnosis", diagnosisRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
 
 export default app;
+
