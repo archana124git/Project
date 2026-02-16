@@ -9,8 +9,8 @@ export default function Navbar() {
     // Clear authentication data
     localStorage.removeItem("authToken"); // or any key you use for login
 
-    // Redirect to login page and replace history to prevent back navigation
-    navigate("/admin-login", { replace: true });
+    // Redirect to home page and replace history to prevent back navigation
+    navigate("/", { replace: true });
   };
 
   return (

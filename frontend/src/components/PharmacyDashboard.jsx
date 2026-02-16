@@ -29,7 +29,7 @@ export default function PharmacyDashboard() {
   // ================= LOGOUT =================
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/admin-login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   // ================= FETCH =================
