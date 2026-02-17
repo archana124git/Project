@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { User, Mic } from "lucide-react";
+import { User, Mic, ArrowLeft } from "lucide-react";
 import axios from "axios";
 import supabase from "../supabaseClient";
 
@@ -135,8 +135,8 @@ export default function PatientDetails() {
   }, [displayId]);
 
   // ===================== DIAGNOSIS DISPLAY LOGIC =====================
-  const displayedDiagnosis = showAllDiagnosis 
-    ? diagnosisHistory 
+  const displayedDiagnosis = showAllDiagnosis
+    ? diagnosisHistory
     : diagnosisHistory.slice(0, 3);
 
   const displayedMedication = showAllMedication
@@ -145,33 +145,38 @@ export default function PatientDetails() {
 
   // ===================== UI =====================
   return (
-    <div className="min-h-screen bg-white">
-      {/* HEADER */}
-      <header className="bg-white shadow-md border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between">
+    <div className="min-h-screen bg-gray-50">
+
+      {/* ── HEADER ── */}
+      <header className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-blue-100 p-2 rounded-full">
-              <User className="w-6 h-6 text-blue-600" />
+            <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full border border-white/30">
+              <User className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-blue-900">
+              <h1 className="text-xl font-bold text-white">
                 Patient Details
               </h1>
-              <p className="text-sm text-gray-500">
-                ID: <span className="text-blue-600">{displayId}</span>
+              <p className="text-sm text-white/80">
+                ID: <span className="font-semibold text-white">{displayId}</span>
               </p>
             </div>
           </div>
 
-          <div className="space-x-2">
-            <button onClick={() => navigate(-1)} className="px-3 py-2 border rounded">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 border border-white/30 text-white rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
               Back
             </button>
             <button
               onClick={startListening}
-              className="px-4 py-2 bg-blue-600 text-white rounded"
+              className="px-4 py-2 bg-white text-teal-600 hover:bg-teal-50 rounded-lg font-semibold transition-all duration-200 shadow-sm flex items-center gap-2"
             >
-              <Mic className="inline w-4 h-4 mr-1" />
+              <Mic className="w-4 h-4" />
               Start Listening
             </button>
           </div>
@@ -179,45 +184,72 @@ export default function PatientDetails() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* PATIENT INFO */}
-        <div className="border rounded p-6 shadow">
-          <h2 className="text-lg font-bold text-blue-900 mb-3">{displayName}</h2>
-          <p><b>Age:</b> {displayAge}</p>
-          <p><b>Gender:</b> {displayGender}</p>
-          <p><b>Contact:</b> {displayContact}</p>
+
+        {/* ── PATIENT INFO CARD ── */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md">
+              <User className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-teal-800">{displayName}</h2>
+              <p className="text-sm text-teal-600">Patient ID: {displayId}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Age</p>
+              <p className="text-gray-800 font-medium mt-1">{displayAge}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Gender</p>
+              <p className="text-gray-800 font-medium mt-1">{displayGender}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Contact</p>
+              <p className="text-gray-800 font-medium mt-1">{displayContact}</p>
+            </div>
+          </div>
         </div>
 
-        {/* DIAGNOSIS & MEDICATION HISTORY - SIDE BY SIDE */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        {/* ── DIAGNOSIS & MEDICATION HISTORY SIDE BY SIDE ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
           {/* DIAGNOSIS HISTORY */}
-          <div className="border rounded p-6 shadow">
-            <h2 className="text-lg font-bold text-blue-900 mb-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
+            <h2 className="text-lg font-bold text-teal-700 mb-4 flex items-center gap-2">
+              <span className="w-2 h-5 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full inline-block"></span>
               Diagnosis History
             </h2>
 
             {loadingDiag ? (
-              <p className="text-gray-500">Loading diagnosis...</p>
+              <p className="text-gray-400 text-sm">Loading diagnosis...</p>
             ) : diagnosisHistory.length === 0 ? (
-              <p className="text-gray-500">No diagnosis recorded</p>
+              <p className="text-gray-400 text-sm">No diagnosis recorded</p>
             ) : (
               <>
                 {displayedDiagnosis.map(d => (
-                  <div key={d.diagnosis_id} className="mb-3 border-b pb-2">
-                    <p className="text-sm text-gray-600">
-                      Date: {new Date(d.created_at).toLocaleDateString()}
+                  <div key={d.diagnosis_id} className="mb-3 border-b border-gray-100 pb-3 last:border-0">
+                    <p className="text-xs text-gray-400 mb-1">
+                      {new Date(d.created_at).toLocaleDateString("en-US", {
+                        year: "numeric", month: "short", day: "numeric"
+                      })}
                     </p>
-                    <p className="text-sm">
-                      <b>Diagnosis:</b> {d.disease_name}
+                    <p className="text-sm text-gray-800">
+                      <span className="font-semibold text-teal-700">Diagnosis:</span>{" "}
+                      {d.disease_name}
                     </p>
                   </div>
                 ))}
-                
+
                 {diagnosisHistory.length > 3 && (
                   <button
                     onClick={() => setShowAllDiagnosis(!showAllDiagnosis)}
-                    className="text-blue-600 text-sm font-medium hover:underline mt-2"
+                    className="text-teal-600 hover:text-teal-700 text-sm font-semibold hover:underline mt-2 transition-colors"
                   >
-                    {showAllDiagnosis ? "Show Less" : `Show More (${diagnosisHistory.length - 3} more)`}
+                    {showAllDiagnosis
+                      ? "Show Less"
+                      : `Show More (${diagnosisHistory.length - 3} more)`}
                   </button>
                 )}
               </>
@@ -225,38 +257,47 @@ export default function PatientDetails() {
           </div>
 
           {/* MEDICATION HISTORY */}
-          <div className="border rounded p-6 shadow">
-            <h2 className="text-lg font-bold text-blue-900 mb-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
+            <h2 className="text-lg font-bold text-teal-700 mb-4 flex items-center gap-2">
+              <span className="w-2 h-5 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full inline-block"></span>
               Past Medication History
             </h2>
 
             {loadingMeds ? (
-              <p className="text-gray-500">Loading medications...</p>
+              <p className="text-gray-400 text-sm">Loading medications...</p>
             ) : medHistory.length === 0 ? (
-              <p className="text-gray-500">No medications found</p>
+              <p className="text-gray-400 text-sm">No medications found</p>
             ) : (
               <>
                 {displayedMedication.map(h => (
-                  <div key={h.prescription_id} className="mb-4 border-b pb-3">
-                    <p className="text-sm text-gray-600">
-                      Date: {new Date(h.created_at).toLocaleDateString()}
+                  <div key={h.prescription_id} className="mb-4 border-b border-gray-100 pb-3 last:border-0">
+                    <p className="text-xs text-gray-400 mb-2">
+                      {new Date(h.created_at).toLocaleDateString("en-US", {
+                        year: "numeric", month: "short", day: "numeric"
+                      })}
                     </p>
-                    <ul className="list-disc ml-5 text-sm">
+                    <ul className="space-y-1">
                       {h.medicines.map((m, i) => (
-                        <li key={i}>
-                          <b>{m.name}</b> — {m.dosage}, {m.frequency}, {m.duration}
+                        <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 bg-teal-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                          <span>
+                            <span className="font-semibold text-teal-700">{m.name}</span>
+                            {" "}— {m.dosage}, {m.frequency}, {m.duration}
+                          </span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 ))}
-                
+
                 {medHistory.length > 3 && (
                   <button
                     onClick={() => setShowAllMedication(!showAllMedication)}
-                    className="text-blue-600 text-sm font-medium hover:underline mt-2"
+                    className="text-teal-600 hover:text-teal-700 text-sm font-semibold hover:underline mt-2 transition-colors"
                   >
-                    {showAllMedication ? "Show Less" : `Show More (${medHistory.length - 3} more)`}
+                    {showAllMedication
+                      ? "Show Less"
+                      : `Show More (${medHistory.length - 3} more)`}
                   </button>
                 )}
               </>

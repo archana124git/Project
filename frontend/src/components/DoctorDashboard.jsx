@@ -112,15 +112,16 @@ export default function DoctorDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white shadow-md border-b border-gray-200">
+    <div className="min-h-screen bg-gray-50">
+
+      {/* ── Header ── */}
+      <header className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-[#1e3a8a]">
+            <h1 className="text-2xl font-bold text-white">
               MediScript Dashboard
             </h1>
-            <p className="text-sm text-[#4b5563] mt-1">
+            <p className="text-sm text-white/80 mt-1">
               {currentTime.toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -139,22 +140,23 @@ export default function DoctorDashboard() {
         </div>
       </header>
 
-      {/* Main */}
+      {/* ── Main ── */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats */}
+
+        {/* ── Stats ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
           {/* Total Patients */}
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-[#4b5563]">Total Patients</p>
-                <p className="text-3xl font-bold text-[#1e3a8a] mt-2">
+                <p className="text-sm text-gray-500">Total Patients</p>
+                <p className="text-3xl font-bold text-teal-700 mt-2">
                   {patients.length}
                 </p>
               </div>
-              <div className="bg-[#eff6ff] p-3 rounded-full">
-                <Calendar className="w-8 h-8 text-[#2563eb]" />
+              <div className="bg-teal-50 p-3 rounded-full">
+                <Calendar className="w-8 h-8 text-teal-600" />
               </div>
             </div>
           </div>
@@ -163,13 +165,13 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm">Completed</p>
-                <p className="text-3xl text-green-600 mt-2">
+                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-3xl text-emerald-600 mt-2">
                   {stats.completed_appointments}
                 </p>
               </div>
-              <div className="bg-green-50 p-3 rounded-full">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+              <div className="bg-emerald-50 p-3 rounded-full">
+                <CheckCircle className="w-8 h-8 text-emerald-600" />
               </div>
             </div>
           </div>
@@ -178,13 +180,13 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm">In Progress</p>
-                <p className="text-3xl text-[#2563eb] mt-2">
+                <p className="text-sm text-gray-500">In Progress</p>
+                <p className="text-3xl text-cyan-600 mt-2">
                   {stats.in_progress_appointments}
                 </p>
               </div>
-              <div className="bg-[#eff6ff] p-3 rounded-full">
-                <Activity className="w-8 h-8 text-[#2563eb]" />
+              <div className="bg-cyan-50 p-3 rounded-full">
+                <Activity className="w-8 h-8 text-cyan-600" />
               </div>
             </div>
           </div>
@@ -193,30 +195,30 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm">Pending</p>
+                <p className="text-sm text-gray-500">Pending</p>
                 <p className="text-3xl text-gray-600 mt-2">
                   {stats.pending_appointments}
                 </p>
               </div>
               <div className="bg-gray-100 p-3 rounded-full">
-                <Clock className="w-8 h-8 text-gray-600" />
+                <Clock className="w-8 h-8 text-gray-500" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Patients Section */}
+        {/* ── Patients Section ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Patients List */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-md border p-6">
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold text-[#1e3a8a] flex items-center">
-                  <Calendar className="w-6 h-6 mr-2" />
+                <h2 className="text-xl font-bold text-teal-700 flex items-center">
+                  <Calendar className="w-6 h-6 mr-2 text-teal-600" />
                   All Patients
                 </h2>
-                <span className="text-sm text-[#4b5563] bg-[#eff6ff] px-3 py-1 rounded-full">
+                <span className="text-sm text-teal-700 bg-teal-50 px-3 py-1 rounded-full">
                   {filteredPatients.length} patients
                 </span>
               </div>
@@ -224,13 +226,13 @@ export default function DoctorDashboard() {
               {/* Search */}
               <div className="w-80">
                 <div className="relative">
-                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-[#2563eb]" />
+                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-teal-500" />
                   <input
                     type="text"
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 border rounded-lg"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 transition-colors"
                   />
                 </div>
               </div>
@@ -246,14 +248,14 @@ export default function DoctorDashboard() {
                 filteredPatients.map((patient) => (
                   <div
                     key={patient.patient_id}
-                    className="border rounded-lg p-4 hover:shadow-md"
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-teal-300 transition-all duration-200"
                   >
                     <div className="flex justify-between">
                       <div>
-                        <h3 className="font-semibold text-[#1e3a8a] text-lg">
+                        <h3 className="font-semibold text-teal-800 text-lg">
                           {patient.name}
                         </h3>
-                        <p className="text-sm text-[#2563eb]">
+                        <p className="text-sm text-teal-600">
                           ID: {patient.patient_id}
                         </p>
                       </div>
@@ -265,7 +267,7 @@ export default function DoctorDashboard() {
                               state: { patient, doctorProfile },
                             })
                           }
-                          className="px-4 py-2 bg-[#2563eb] text-white rounded-lg"
+                          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full"
                         >
                           View Details
                         </button>
@@ -276,14 +278,13 @@ export default function DoctorDashboard() {
                               state: {
                                 doctor: doctorProfile,
                                 patient: patient,
-                              }
+                              },
                             })
                           }
-                          className="px-3 py-1 border border-[#2563eb] text-[#2563eb] rounded-lg"
+                          className="px-3 py-1 border-2 border-teal-500 text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-all duration-200 block w-full"
                         >
                           Start Listening
                         </button>
-
                       </div>
                     </div>
                   </div>
@@ -292,31 +293,33 @@ export default function DoctorDashboard() {
             </div>
           </div>
 
-          {/* Right Side Profile */}
+          {/* ── Right Side Profile ── */}
           <div className="space-y-6">
-            <div className="bg-white border rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-[#1e3a8a] flex items-center">
-                <User className="w-6 h-6 mr-2" />
+            <div className="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold text-teal-700 flex items-center">
+                <User className="w-6 h-6 mr-2 text-teal-600" />
                 Your Profile
               </h2>
 
               <div className="flex items-center mt-4">
-                <div className="w-16 h-16 bg-[#eff6ff] rounded-full flex items-center justify-center">
-                  <User className="w-8 h-8 text-[#2563eb]" />
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md">
+                  <User className="w-8 h-8 text-white" />
                 </div>
 
                 <div className="ml-4">
-                  <h3 className="font-semibold text-lg">{doctorProfile.name}</h3>
-                  <p className="text-sm text-[#4b5563]">
+                  <h3 className="font-semibold text-gray-800 text-lg">
+                    {doctorProfile.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">
                     {doctorProfile.specialization}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 border-t pt-3">
+              <div className="mt-4 border-t border-gray-100 pt-3">
                 <p className="text-sm">
-                  <span className="text-[#4b5563]">License:</span>{" "}
-                  <span className="font-medium text-[#2563eb]">
+                  <span className="text-gray-500">License:</span>{" "}
+                  <span className="font-medium text-teal-600">
                     {doctorProfile.license_number}
                   </span>
                 </p>
@@ -324,12 +327,13 @@ export default function DoctorDashboard() {
 
               <button
                 onClick={() => setIsProfileOpen(true)}
-                className="w-full mt-4 border-2 border-[#2563eb] text-[#2563eb] py-2 rounded-lg"
+                className="w-full mt-4 border-2 border-teal-500 text-teal-600 hover:bg-teal-50 py-2 rounded-lg font-medium transition-all duration-200"
               >
                 View Full Profile
               </button>
             </div>
           </div>
+
         </div>
       </main>
 

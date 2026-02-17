@@ -41,394 +41,309 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
+    <div className="min-h-screen relative flex bg-white">
 
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Gradient Orbs */}
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-        
-        {/* Floating Particles */}
-        <div className="particle particle-1"></div>
-        <div className="particle particle-2"></div>
-        <div className="particle particle-3"></div>
-        <div className="particle particle-4"></div>
-        <div className="particle particle-5"></div>
-        <div className="particle particle-6"></div>
-        
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      </div>
+      {/* ── Left Hero Panel ── */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 p-12 relative overflow-hidden">
 
-      {/* Top Navigation */}
-      <div className="absolute top-8 right-8 z-20 flex gap-3">
+        {/* Grid pattern */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+          </div>
 
-        <Link
-          to="/admin-login"
-          className="group relative px-6 py-2.5 text-sm font-semibold text-white/90 hover:text-white transition-all duration-300"
-        >
-          <span className="relative z-10">Admin Login</span>
-          <span className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></span>
-        </Link>
-        <Link
-  to="/patient"
-  className="group relative px-6 py-2.5 text-sm font-semibold text-white/90 hover:text-white transition-all duration-300"
->
-  <span className="relative z-10">Patient Login</span>
-  <span className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></span>
-</Link>
+          {/* Floating shapes */}
+          <div className="shape shape-1"></div>
+          <div className="shape shape-2"></div>
+          <div className="shape shape-3"></div>
+        </div>
 
-      </div>
+        <div className="relative z-10 flex flex-col justify-between w-full">
 
-      {/* Main Section */}
-      <div className="flex flex-1 items-center justify-center px-6 py-12 relative z-10">
-        <div className="w-full max-w-6xl bg-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden flex border border-white/10 login-container">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-white">MediScript</h1>
+          </div>
 
-          {/* Left Branding Panel */}
-          <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-purple-600/90 text-white p-16 items-center relative overflow-hidden">
-            
-            {/* Animated Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-full h-full">
-                <div className="wave-pattern"></div>
+          {/* Main content */}
+          <div className="space-y-8 mt-20">
+            <div className="space-y-6">
+              <div className="inline-block">
+                <span className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-medium">
+                  Healthcare Innovation
+                </span>
               </div>
+
+              <h2 className="text-5xl font-bold text-white leading-tight">
+                AI-Powered<br />
+                Clinical<br />
+                Documentation
+              </h2>
+
+              <p className="text-xl text-white/90 leading-relaxed max-w-md">
+                Revolutionize your medical practice with intelligent voice transcription and automated prescription generation
+              </p>
             </div>
 
-            <div className="relative z-10 space-y-8">
-              <div className="brand-title">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center logo-pulse">
-                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            {/* Feature list */}
+            <div className="space-y-4 pt-6">
+              {[
+                "Real-time Voice Recognition",
+                "AI-Generated Medical Notes",
+                "Digital Prescription System",
+              ].map((feature) => (
+                <div key={feature} className="flex items-center gap-3 text-white">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/30">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h1 className="text-5xl font-bold tracking-tight">
-                    MediScript
-                  </h1>
+                  <span className="text-lg font-medium">{feature}</span>
                 </div>
-                <div className="h-1 w-24 bg-gradient-to-r from-white to-transparent rounded-full"></div>
-              </div>
-
-              <p className="text-blue-50 text-lg leading-relaxed max-w-md">
-                Transform healthcare documentation with AI-powered precision and effortless voice-to-text clinical notes.
-              </p>
-
-              <div className="feature-card bg-white/10 backdrop-blur-md rounded-2xl p-6 max-w-md border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  How It Works
-                </h2>
-                <ol className="space-y-3 text-blue-50">
-                  <li className="flex items-start gap-3 feature-item">
-                    <span className="flex-shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</span>
-                    <span>Capture consultation using voice recognition</span>
-                  </li>
-                  <li className="flex items-start gap-3 feature-item">
-                    <span className="flex-shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</span>
-                    <span>AI generates structured medical notes</span>
-                  </li>
-                  <li className="flex items-start gap-3 feature-item">
-                    <span className="flex-shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</span>
-                    <span>Create instant digital prescriptions</span>
-                  </li>
-                </ol>
-              </div>
-
-              
+              ))}
             </div>
           </div>
 
-          {/* Right Login Panel */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center px-10 py-16 bg-slate-900/40 backdrop-blur-xl">
-            <div className="w-full max-w-md">
-
-              <div className="text-center mb-10 fade-in">
-                <h2 className="text-4xl font-bold text-white mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Welcome Back
-                </h2>
-                <p className="text-slate-400 text-lg">
-                  Sign in to access your dashboard
-                </p>
-              </div>
-
-              <form onSubmit={handleLogin} className="space-y-6">
-
-                <div className="form-group">
-                  <label className="block text-sm font-semibold text-slate-300 mb-2.5 tracking-wide">
-                    User ID
-                  </label>
-                  <div className="relative input-wrapper">
-                    <input
-                      type="text"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                      placeholder="DOC1001"
-                      className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300 backdrop-blur-sm"
-                      required
-                    />
-                    <div className="input-glow"></div>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="block text-sm font-semibold text-slate-300 mb-2.5 tracking-wide">
-                    Password
-                  </label>
-                  <div className="relative input-wrapper">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full px-5 py-4 pr-12 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-300 backdrop-blur-sm"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors duration-200"
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                    <div className="input-glow"></div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <Link
-                    to="/forgot-pwd"
-                    className="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200 hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-
-                <button
-                  type="submit"
-                  className="group relative w-full bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 hover:from-blue-500 hover:via-blue-400 hover:to-purple-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/30 transition-all duration-300 overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    Login
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="button-shine"></div>
-                </button>
-              </form>
-
-              {error && (
-                <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 backdrop-blur-sm error-shake">
-                  <p className="text-red-400 text-center text-sm font-medium">
-                    {error}
-                  </p>
-                </div>
-              )}
-
-              <div className="mt-8 pt-6 border-t border-white/5 text-center">
-                <p className="text-slate-500 text-sm">
-                  Secured by enterprise-grade encryption
-                </p>
-              </div>
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-white/20">
+            <div>
+              <div className="text-3xl font-bold text-white">5000+</div>
+              <div className="text-sm text-white/80">Active Users</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-white">99.8%</div>
+              <div className="text-sm text-white/80">Accuracy</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-white">24/7</div>
+              <div className="text-sm text-white/80">Support</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Animations & Styles */}
-      <style>
-        {`
-          @keyframes blob {
-            0%, 100% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+      {/* ── Right Login Panel ── */}
+      <div className="flex-1 flex flex-col">
+
+        {/* Top nav */}
+        <div className="flex justify-between items-center p-6 lg:p-8">
+          {/* Mobile logo only */}
+          <div className="lg:hidden flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <span className="text-xl font-bold text-gray-900">MediScript</span>
+          </div>
+
+          <div className="flex items-center gap-3 ml-auto">
+            <span className="text-sm text-gray-600">Need help?</span>
+            <Link
+              to="/admin-login"
+              className="text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+            >
+              Admin
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link
+              to="/patient"
+              className="text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+            >
+              Patient
+            </Link>
+          </div>
+        </div>
+
+        {/* Form area */}
+        <div className="flex-1 flex items-center justify-center px-6 py-12">
+          <div className="w-full max-w-md">
+
+            <div className="mb-10">
+              <h2 className="text-4xl font-bold text-gray-900 mb-3">Sign In</h2>
+              <p className="text-gray-600 text-lg">
+                Enter your credentials to access your account
+              </p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+
+              {/* User ID */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-900 uppercase tracking-wide">
+                  User ID
+                </label>
+                <input
+                  type="text"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  placeholder="DOC1001"
+                  className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:bg-white transition-all duration-300 font-medium"
+                  required
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-900 uppercase tracking-wide">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="w-full px-4 py-4 pr-12 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:bg-white transition-all duration-300 font-medium"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember me */}
+              <div className="flex items-center justify-between pt-2">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 text-teal-600 bg-gray-100 border-2 border-gray-300 rounded focus:ring-2 focus:ring-teal-500"
+                  />
+                  <span className="ml-3 text-sm font-medium text-gray-700">Keep me signed in</span>
+                </label>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg tracking-wide"
+              >
+                Sign In
+              </button>
+
+              {/* Forgot */}
+              <div className="text-center">
+                <Link
+                  to="/forgot-pwd"
+                  className="text-sm font-medium text-teal-600 hover:text-teal-700 hover:underline transition-colors"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+            </form>
+
+            {/* Error */}
+            {error && (
+              <div className="mt-6 p-4 rounded-xl bg-red-50 border-2 border-red-200 error-shake">
+                <p className="text-red-600 text-center text-sm font-semibold">{error}</p>
+              </div>
+            )}
+
+            {/* Security note */}
+            <div className="mt-10 pt-8 border-t-2 border-gray-100">
+              <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span className="font-medium">Secured with 256-bit SSL encryption</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* ── Global Styles ── */}
+      <style>{`
+        .shape {
+          position: absolute;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .shape-1 {
+          width: 200px; height: 200px;
+          top: 10%; right: 10%;
+          animation: float1 15s ease-in-out infinite;
+        }
+
+        .shape-2 {
+          width: 150px; height: 150px;
+          bottom: 20%; left: 15%;
+          animation: float2 20s ease-in-out infinite;
+        }
+
+        .shape-3 {
+          width: 180px; height: 180px;
+          top: 50%; right: 20%;
+          animation: float3 18s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
           }
-
-          .animate-blob {
-            animation: blob 7s infinite;
+          50% {
+            transform: translate(30px, -30px) rotate(180deg);
+            border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
           }
+        }
 
-          .animation-delay-2000 {
-            animation-delay: 2s;
+        @keyframes float2 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
           }
-
-          .animation-delay-4000 {
-            animation-delay: 4s;
+          50% {
+            transform: translate(-20px, 40px) rotate(-180deg);
+            border-radius: 60% 40% 30% 70% / 60% 50% 40% 60%;
           }
+        }
 
-          .bg-grid-pattern {
-            background-image: 
-              linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
+        @keyframes float3 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+            border-radius: 50% 50% 30% 70% / 50% 30% 70% 50%;
           }
-
-          .particle {
-            position: absolute;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
-            border-radius: 50%;
-            animation: float 20s infinite;
+          50% {
+            transform: translate(25px, 35px) rotate(180deg);
+            border-radius: 50% 50% 70% 30% / 50% 70% 30% 50%;
           }
+        }
 
-          .particle-1 { width: 4px; height: 4px; top: 20%; left: 10%; animation-delay: 0s; }
-          .particle-2 { width: 6px; height: 6px; top: 40%; left: 30%; animation-delay: 2s; }
-          .particle-3 { width: 3px; height: 3px; top: 60%; left: 50%; animation-delay: 4s; }
-          .particle-4 { width: 5px; height: 5px; top: 30%; left: 70%; animation-delay: 1s; }
-          .particle-5 { width: 4px; height: 4px; top: 70%; left: 20%; animation-delay: 3s; }
-          .particle-6 { width: 6px; height: 6px; top: 50%; left: 85%; animation-delay: 5s; }
+        .error-shake {
+          animation: shake 0.4s ease-in-out;
+        }
 
-          @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
-            50% { transform: translate(30px, -100px) scale(1.5); opacity: 0.6; }
-          }
-
-          .login-container {
-            animation: slideUp 0.6s ease-out;
-          }
-
-          @keyframes slideUp {
-            from {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          .fade-in {
-            animation: fadeIn 0.8s ease-out;
-          }
-
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-
-          .brand-title {
-            animation: fadeInLeft 0.8s ease-out;
-          }
-
-          @keyframes fadeInLeft {
-            from {
-              opacity: 0;
-              transform: translateX(-20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-
-          .feature-card {
-            animation: fadeInLeft 1s ease-out 0.2s both;
-          }
-
-          .feature-item {
-            animation: fadeInLeft 0.6s ease-out both;
-          }
-
-          .feature-item:nth-child(1) { animation-delay: 0.3s; }
-          .feature-item:nth-child(2) { animation-delay: 0.4s; }
-          .feature-item:nth-child(3) { animation-delay: 0.5s; }
-
-          .stat-badge {
-            animation: fadeInLeft 0.8s ease-out 0.6s both;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-          }
-
-          .logo-pulse {
-            animation: pulse 2s ease-in-out infinite;
-          }
-
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-          }
-
-          .wave-pattern {
-            width: 100%;
-            height: 100%;
-            background: 
-              repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255, 255, 255, 0.03) 10px,
-                rgba(255, 255, 255, 0.03) 20px
-              );
-            animation: wave 20s linear infinite;
-          }
-
-          @keyframes wave {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(40px); }
-          }
-
-          .form-group {
-            animation: fadeIn 0.8s ease-out both;
-          }
-
-          .form-group:nth-child(1) { animation-delay: 0.2s; }
-          .form-group:nth-child(2) { animation-delay: 0.3s; }
-
-          .input-wrapper {
-            position: relative;
-          }
-
-          .input-glow {
-            position: absolute;
-            inset: -2px;
-            border-radius: 16px;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s;
-            filter: blur(8px);
-          }
-
-          .input-wrapper:focus-within .input-glow {
-            opacity: 0.5;
-          }
-
-          .button-shine {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-              90deg,
-              transparent,
-              rgba(255, 255, 255, 0.3),
-              transparent
-            );
-            transition: left 0.5s;
-          }
-
-          button:hover .button-shine {
-            left: 100%;
-          }
-
-          .error-shake {
-            animation: shake 0.5s, fadeIn 0.3s;
-          }
-
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-          }
-        `}
-      </style>
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25%       { transform: translateX(-10px); }
+          75%       { transform: translateX(10px); }
+        }
+      `}</style>
     </div>
   );
 }
