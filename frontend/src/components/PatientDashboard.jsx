@@ -43,6 +43,9 @@ export default function PatientDashboard() {
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayString = new Date().toISOString().split("T")[0];
+  const now = new Date();
+const currentHour = now.getHours();
 
   const totalVisits = appointments.filter((appt) => {
     const apptDate = new Date(appt.appointment_date);
@@ -155,6 +158,31 @@ useEffect(() => {
       setError("Please select date and session");
       return;
     }
+    const selectedDate = new Date(date);
+const todayDate = new Date();
+todayDate.setHours(0, 0, 0, 0);
+
+if (selectedDate < todayDate) {
+  setError("Cannot book appointment for past dates.");
+  return;
+}
+if (selectedDate < todayDate) {
+  setError("Cannot book appointment for past dates.");
+  return;
+}
+
+// ⬇️ ADD THIS BLOCK RIGHT HERE
+if (date === todayString) {
+  if (time === "FN" && currentHour >= 12) {
+    setError("FN session is closed for today.");
+    return;
+  }
+
+  if (time === "AN" && currentHour >= 18) {
+    setError("AN session is closed for today.");
+    return;
+  }
+}
     const { count, error: countError } = await supabase
     .from("appointments")
     .select("*", { count: "exact", head: true })
@@ -456,6 +484,7 @@ await fetchSlotStatus();
                               <input
                                 type="date"
                                 value={date}
+                                min={todayString}
                                 onChange={(e) => setDate(e.target.value)}
                                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 transition-colors"
                               />
@@ -471,7 +500,7 @@ await fetchSlotStatus();
   <button
   type="button"
   onClick={() => setTime("FN")}
-  disabled={slotStatus.FN >= 3}
+  disabled={slotStatus.FN >= 3 || (date === todayString && currentHour >= 12)}
   className={`px-4 py-2 rounded-lg text-white font-medium transition-all duration-200
     ${
       time === "FN"
@@ -488,16 +517,19 @@ await fetchSlotStatus();
   `}
 >
   FN{" "}
-  {slotStatus.FN >= 3
-    ? "(Full)"
-    : `(${3 - slotStatus.FN} left)`}
+{date === todayString && currentHour >= 12
+  ? "(Closed)"
+  : slotStatus.FN >= 3
+  ? "(Full)"
+  : `(${3 - slotStatus.FN} left)`}
 </button>
 
   {/* AN Button */}
   <button
   type="button"
   onClick={() => setTime("AN")}
-  disabled={slotStatus.AN >= 10}
+  disabled={slotStatus.AN >= 10 ||
+  (date === todayString && currentHour >= 18)}
   className={`px-4 py-2 rounded-lg text-white font-medium transition-all duration-200
     ${
       time === "AN"
@@ -514,9 +546,11 @@ await fetchSlotStatus();
   `}
 >
   AN{" "}
-  {slotStatus.AN >= 10
-    ? "(Full)"
-    : `(${10 - slotStatus.AN} left)`}
+ {date === todayString && currentHour >= 18
+  ? "(Closed)"
+  : slotStatus.AN >= 10
+  ? "(Full)"
+  : `(${10 - slotStatus.AN} left)`}
 </button>
 </div>
                             </div>
