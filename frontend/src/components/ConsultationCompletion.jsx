@@ -35,11 +35,17 @@ export default function ConsultationCompletion() {
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [savedPrescriptionId, setSavedPrescriptionId] = useState(null);
   const [formData, setFormData] = useState({
     diagnosis: "",
     severity: "Moderate",
     additionalNotes: ""
   });
+  // State for delete success popup
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  // State for error and highlighting
+  const [showMedicineError, setShowMedicineError] = useState(false);
+  const [incompleteRows, setIncompleteRows] = useState([]);
 
 useEffect(() => {
   if (!editableSummary) return;
@@ -93,6 +99,20 @@ const fetchRecommendations = async () => {
   }
 };
 
+  const deletePrescription = async (prescriptionId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/prescriptions/${prescriptionId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!res.ok) throw new Error("Failed to delete prescription");
+    } catch (error) {
+      console.error("Delete prescription error:", error);
+    }
+  };
+
 
 
 
@@ -118,6 +138,14 @@ const fetchRecommendations = async () => {
   };
 
   const handleAddMedicine = () => {
+    // Prevent adding if last row is incomplete
+    if (prescribedMedicines.length > 0) {
+      const last = prescribedMedicines[prescribedMedicines.length - 1];
+      if (!last.medicine_id || !last.name || last.name.trim() === "") {
+        alert("Please select a valid medicine in the last row before adding another.");
+        return;
+      }
+    }
     setPrescribedMedicines([
       ...prescribedMedicines,
       {
@@ -158,21 +186,25 @@ const fetchRecommendations = async () => {
   };
 
   const handleSubmit = async (e) => {
+
+
       e.preventDefault();
       setSaving(true);
 
-      // Validation: At least one medicine
-      if (prescribedMedicines.length === 0) {
-        alert("Please add at least one medicine before saving the prescription.");
+      // Remove empty/incomplete medicine rows before submit
+      const cleanedMedicines = prescribedMedicines.filter(m => m.medicine_id && m.name && m.name.trim() !== "");
+      if (cleanedMedicines.length === 0) {
+        setShowMedicineError(true);
+        setTimeout(() => setShowMedicineError(false), 3000);
         setSaving(false);
+        // Highlight incomplete rows
+        setIncompleteRows(prescribedMedicines.map(m => (!m.medicine_id || !m.name || m.name.trim() === "") ? m.id : null).filter(Boolean));
         return;
+      } else {
+        setIncompleteRows([]);
       }
-      // Validation: All medicines must have a name
-      if (prescribedMedicines.some(m => !m.name || m.name.trim() === "")) {
-        alert("All medicines must have a name.");
-        setSaving(false);
-        return;
-      }
+      // Update state so preview shows only valid medicines
+      setPrescribedMedicines(cleanedMedicines);
 
 
     try {
@@ -221,8 +253,8 @@ const fetchRecommendations = async () => {
         body: JSON.stringify({
           doctor_id: doctor.user_id,
           patient_id: patient.patient_id,
-          medicines: prescribedMedicines.map(m => ({
-            medicine_id: m.medicine_id || null,
+          medicines: cleanedMedicines.map(m => ({
+            medicine_id: m.medicine_id,
             name: m.name,
             dosage: m.dosage,
             frequency: m.frequency,
@@ -237,6 +269,10 @@ const fetchRecommendations = async () => {
         console.error("Prescription API error:", errorData);
         throw new Error("Failed to save prescription");
       }
+
+      const prescriptionData = await prescriptionRes.json();
+      setSavedPrescriptionId(prescriptionData.prescription_id);
+
       setSaving(false);
       setShowSuccess(true);
       setShowPreview(true);
@@ -537,6 +573,8 @@ const fetchRecommendations = async () => {
                 type="button"
                 onClick={handleAddMedicine}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-medium text-sm transition-all duration-200 shadow-sm"
+                disabled={prescribedMedicines.length > 0 && (!prescribedMedicines[prescribedMedicines.length - 1].medicine_id || !prescribedMedicines[prescribedMedicines.length - 1].name || prescribedMedicines[prescribedMedicines.length - 1].name.trim() === "")}
+                style={prescribedMedicines.length > 0 && (!prescribedMedicines[prescribedMedicines.length - 1].medicine_id || !prescribedMedicines[prescribedMedicines.length - 1].name || prescribedMedicines[prescribedMedicines.length - 1].name.trim() === "") ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               >
                 <Plus className="w-4 h-4" />
                 Add Medicine
@@ -544,7 +582,13 @@ const fetchRecommendations = async () => {
             </div>
 
             {prescribedMedicines.map((med, index) => (
-              <div key={med.id} className="border border-gray-200 bg-gray-50 rounded-lg p-5 mb-4 last:mb-0">
+              <div key={med.id} className={`border rounded-lg p-5 mb-4 last:mb-0 ${incompleteRows.includes(med.id) ? 'border-red-400 bg-red-50 animate-pulse' : 'border-gray-200 bg-gray-50'}`}> 
+        {/* Error message for no valid medicine */}
+        {showMedicineError && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center font-semibold animate-pulse">
+            Please select at least one valid medicine before saving the prescription.
+          </div>
+        )}
 
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-semibold text-teal-700 text-sm">Medicine {index + 1}</span>
@@ -737,18 +781,41 @@ const fetchRecommendations = async () => {
             ))}
           </div>
 
-        </form>
 
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
             <button 
               type="button" 
-              onClick={() => navigate('/dashboard')}
+              onClick={async () => {
+                if (!savedPrescriptionId) return;
+                if (window.confirm("Are you sure you want to delete this prescription? ")) {
+                  try {
+                    await fetch(`http://localhost:5000/api/prescriptions/${savedPrescriptionId}`, {
+                      method: "DELETE",
+                      headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setSavedPrescriptionId(null);
+                    setShowPreview(false);
+                    setShowDeleteSuccess(true);
+                    setTimeout(() => setShowDeleteSuccess(false), 2500);
+                  } catch (err) {
+                    console.error("Failed to delete prescription on cancel", err);
+                  }
+                }
+              }}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
             >
               Cancel
             </button>
+
+      {/* Delete success popup */}
+      {showDeleteSuccess && (
+        <div className="fixed top-24 right-6 bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center space-x-3 animate-slide-in z-50">
+          <Trash2 className="w-6 h-6" />
+          <span className="font-medium">Prescription deleted successfully.</span>
+        </div>
+      )}
 
             <button 
               type="submit"
@@ -768,6 +835,8 @@ const fetchRecommendations = async () => {
               )}
             </button>
           </div>
+          
+        </form>
         
 
         {/* Prescription Preview */}

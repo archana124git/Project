@@ -36,6 +36,10 @@ export default function PatientDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [slotStatus, setSlotStatus] = useState({
+  FN: 0,
+  AN: 0,
+});
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -111,6 +115,7 @@ export default function PatientDashboard() {
           `
           appointment_date,
           session,
+          token_number,
           users(name, specialization)
         `
         )
@@ -121,6 +126,28 @@ export default function PatientDashboard() {
     if (patientId) fetchAppointments();
   }, [patientId]);
 
+  const fetchSlotStatus = async () => {
+  if (!selectedDoctor || !date) return;
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("session")
+    .eq("doctor_id", selectedDoctor.user_id)
+    .eq("appointment_date", date);
+
+  if (error) return;
+
+  const fnCount = data.filter((a) => a.session === "FN").length;
+  const anCount = data.filter((a) => a.session === "AN").length;
+
+  setSlotStatus({
+    FN: fnCount,
+    AN: anCount,
+  });
+};
+useEffect(() => {
+  fetchSlotStatus();
+}, [selectedDoctor, date]);
   /* ---------------- Booking ---------------- */
   const handleBookSlot = async () => {
     setError("");
@@ -128,26 +155,46 @@ export default function PatientDashboard() {
       setError("Please select date and session");
       return;
     }
-    const payload = {
+    const { count, error: countError } = await supabase
+    .from("appointments")
+    .select("*", { count: "exact", head: true })
+    .eq("doctor_id", selectedDoctor.user_id)
+    .eq("appointment_date", date)
+    .eq("session", time);
+    if (countError) {
+    setError(countError.message);
+    return;
+  }
+
+  const tokenNumber = (count || 0) + 1;
+  if (count >= 10) {
+  setError("This session is fully booked.");
+  return;
+}
+
+  // 2️⃣ Insert appointment with token
+  const {data, error } = await supabase.from("appointments").insert([
+    {
       patient_id: patient.patient_id,
       doctor_id: selectedDoctor.user_id,
       appointment_date: date,
       session: time,
-    };
-    const { error } = await supabase.from("appointments").insert(payload);
-    if (error) {
-      if (error.code === "23505") {
-        setError("This slot is already booked.");
-      } else {
-        setError(error.message);
-      }
-      return;
-    }
-    alert("Appointment booked successfully");
-    setDate("");
-    setTime("");
-    setSelectedDoctor(null);
-  };
+      token_number: tokenNumber,
+    },
+  ]);
+
+  if (error) {
+    setError(error.message);
+    return;
+  }
+await fetchSlotStatus();
+  alert(`Appointment booked successfully!\nYour Token Number is ${tokenNumber}`);
+    await fetchAppointments();
+
+  setDate("");
+  setTime("");
+  setSelectedDoctor(null);
+};
 
   const handleLogout = () => {
     navigate("/");
@@ -419,16 +466,66 @@ export default function PatientDashboard() {
                               <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Preferred Session
                               </label>
-                              <select
-                                value={time}
-                                onChange={(e) => setTime(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 transition-colors"
-                              >
-                                <option value="">Choose a session...</option>
-                                <option value="FN">Morning (FN)</option>
-                                <option value="AN">Afternoon (AN)</option>
-                              </select>
+                              <div className="flex gap-3">
+  {/* FN Button */}
+  <button
+  type="button"
+  onClick={() => setTime("FN")}
+  disabled={slotStatus.FN >= 3}
+  className={`px-4 py-2 rounded-lg text-white font-medium transition-all duration-200
+    ${
+      time === "FN"
+        ? "ring-4 ring-teal-300 scale-105"
+        : ""
+    }
+    ${
+      slotStatus.FN >= 3
+        ? "bg-red-500 cursor-not-allowed"
+        : slotStatus.FN >= 2
+        ? "bg-orange-500"
+        : "bg-green-500"
+    }
+  `}
+>
+  FN{" "}
+  {slotStatus.FN >= 3
+    ? "(Full)"
+    : `(${3 - slotStatus.FN} left)`}
+</button>
+
+  {/* AN Button */}
+  <button
+  type="button"
+  onClick={() => setTime("AN")}
+  disabled={slotStatus.AN >= 10}
+  className={`px-4 py-2 rounded-lg text-white font-medium transition-all duration-200
+    ${
+      time === "AN"
+        ? "ring-4 ring-teal-300 scale-105"
+        : ""
+    }
+    ${
+      slotStatus.AN >= 10
+        ? "bg-red-500 cursor-not-allowed"
+        : slotStatus.AN >= 8
+        ? "bg-orange-500"
+        : "bg-green-500"
+    }
+  `}
+>
+  AN{" "}
+  {slotStatus.AN >= 10
+    ? "(Full)"
+    : `(${10 - slotStatus.AN} left)`}
+</button>
+</div>
                             </div>
+
+                            {slotStatus.FN >= 10 && slotStatus.AN >= 10 && (
+  <div className="bg-red-100 border border-red-300 text-red-700 text-sm p-3 rounded-lg mt-3 text-center font-medium">
+    Booking Closed for this Date
+  </div>
+)}
 
                             {error && (
                               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -445,7 +542,7 @@ export default function PatientDashboard() {
                             </button>
 
                             <p className="text-xs text-gray-500 text-center">
-                              You will receive a confirmation email shortly
+                             
                             </p>
                           </div>
                         </div>
@@ -472,7 +569,7 @@ export default function PatientDashboard() {
                         {patient.name}
                       </h3>
                       <p className="text-sm text-gray-500">
-                        ID: #PT-{patient.patient_id}
+                        ID: PT-{patient.patient_id}
                       </p>
                     </div>
                   </div>
@@ -559,6 +656,9 @@ export default function PatientDashboard() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-teal-700 uppercase tracking-wider">
                       Department
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-teal-700 uppercase tracking-wider">
+                      Token Number
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -609,6 +709,11 @@ export default function PatientDashboard() {
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-700">
                             {a.users?.specialization}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-bold bg-emerald-600 text-white shadow">
+                              {a.token_number}
+                            </span>
                           </td>
                         </tr>
                       ))

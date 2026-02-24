@@ -122,4 +122,45 @@ router.get("/:id", authMiddleware, async (req, res) => {
   }
 });
 
+/* ============================================================================
+   DELETE PRESCRIPTION
+============================================================================ */
+router.delete("/:prescriptionId", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role.toLowerCase() !== "doctor") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const { prescriptionId } = req.params;
+
+    // First delete prescription_medicine records
+    const { error: medError } = await supabase
+      .from("prescription_medicine")
+      .delete()
+      .eq("prescription_id", prescriptionId);
+
+    if (medError) {
+      console.error(medError);
+      return res.status(500).json({ error: "Failed to delete prescription medicines" });
+    }
+
+    // Then delete the prescription
+    const { error: presError } = await supabase
+      .from("prescriptions")
+      .delete()
+      .eq("prescription_id", prescriptionId);
+
+    if (presError) {
+      console.error(presError);
+      return res.status(500).json({ error: "Failed to delete prescription" });
+    }
+
+    res.status(200).json({ message: "Prescription deleted successfully" });
+
+  } catch (err) {
+    console.error("DELETE PRESCRIPTION ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;   // ✅ ALWAYS LAST

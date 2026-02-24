@@ -51,12 +51,12 @@ function PatientLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-800 rounded-lg mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg mb-4 shadow-md">
             <span className="text-white font-semibold text-lg">AP</span>
           </div>
           <h1 className="text-2xl font-semibold text-gray-900">
@@ -83,7 +83,7 @@ function PatientLogin() {
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
                 placeholder="Enter your Patient ID"
-                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 required
               />
             </div>
@@ -98,7 +98,7 @@ function PatientLogin() {
                 onChange={(e) => setMobile(e.target.value)}
                 placeholder="Enter 10-digit mobile number"
                 maxLength={10}
-                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 required
               />
               <p className="mt-1 text-xs text-gray-500">
@@ -114,7 +114,7 @@ function PatientLogin() {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-md font-medium text-white bg-gray-800 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition-colors"
+              className="w-full py-3 px-4 rounded-md font-medium text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all shadow-md hover:shadow-lg"
             >
               Login
             </button>
@@ -123,7 +123,7 @@ function PatientLogin() {
           <div className="mt-6 text-center">
             <Link
               to="/"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-teal-600 hover:text-teal-700 transition-colors font-medium"
             >
               ← Back to Portal
             </Link>

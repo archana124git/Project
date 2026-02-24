@@ -72,24 +72,24 @@ function PatientRegister() {
     }
 
     // Navigate using patient_code if exists else mobile
- // Get inserted patient row
-const patient = data[0];
+    // Get inserted patient row
+    const patient = data[0];
 
-// ✅ Show success popup
-alert("Registration Successful ✅");
+    // ✅ Show success popup
+    alert("Registration Successful ✅");
 
-// ✅ Store patient_id locally (important for dashboard fetch)
-localStorage.setItem("patient_id", patient.patient_id);
+    // ✅ Store patient_id locally (important for dashboard fetch)
+    localStorage.setItem("patient_id", patient.patient_id);
 
-// ✅ Redirect to patient dashboard
-navigate("/patient/dashboard", { state: { patient } });
+    // ✅ Redirect to patient dashboard
+    navigate("/patient/dashboard", { state: { patient } });
 
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
-        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
+        <h2 className="text-2xl font-bold text-center text-teal-600 mb-6">
           New Patient Registration
         </h2>
 
@@ -99,20 +99,20 @@ navigate("/patient/dashboard", { state: { patient } });
             placeholder="Full Name *"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
           />
 
           <input
             type="date"
             value={dob}
             onChange={(e) => setDob(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
           />
 
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
           >
             <option value="">Select Gender *</option>
             <option value="Male">Male</option>
@@ -123,7 +123,7 @@ navigate("/patient/dashboard", { state: { patient } });
           <select
             value={bloodgroup}
             onChange={(e) => setBloodgroup(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
           >
             <option value="">Select Blood Group</option>
             <option>A+</option>
@@ -141,7 +141,7 @@ navigate("/patient/dashboard", { state: { patient } });
             placeholder="Mobile Number *"
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
           />
 
           <select
@@ -150,7 +150,7 @@ navigate("/patient/dashboard", { state: { patient } });
               setHasInsurance(e.target.value);
               setInsuranceCompany("");
             }}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
           >
             <option value="">Do you have Insurance?</option>
             <option value="Yes">Yes</option>
@@ -161,7 +161,7 @@ navigate("/patient/dashboard", { state: { patient } });
             <select
               value={insuranceCompany}
               onChange={(e) => setInsuranceCompany(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 outline-none"
             >
               <option value="">Select Insurance Company</option>
               <option>HDFC ERGO</option>
@@ -175,7 +175,7 @@ navigate("/patient/dashboard", { state: { patient } });
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-500 transition mt-4"
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold transition mt-4"
           >
             {loading ? "Registering..." : "Register & Continue"}
           </button>

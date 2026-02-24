@@ -6,13 +6,13 @@ function PatientAccess() {
 
   return (
     <div className="min-h-screen flex items-center justify-center 
-                    bg-gradient-to-br from-blue-50 to-gray-100 px-4">
+                    bg-gradient-to-br from-gray-50 to-gray-100 px-4">
       <div className="w-full max-w-lg">
 
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center 
-                          w-16 h-16 bg-blue-600 rounded-2xl shadow-md mb-4">
+                          w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-md mb-4">
             <span className="text-white font-semibold text-lg">AP</span>
           </div>
 
@@ -32,7 +32,7 @@ function PatientAccess() {
           <button
             onClick={() => navigate("/patient/login")}
             className="w-full p-5 rounded-xl border border-gray-200 
-                       hover:border-blue-500 hover:shadow-md 
+                       hover:border-teal-500 hover:shadow-md 
                        transition-all text-left"
           >
             <h2 className="text-lg font-semibold text-gray-900">
@@ -46,7 +46,7 @@ function PatientAccess() {
           <button
             onClick={() => navigate("/patient/register")}
             className="w-full p-5 rounded-xl border border-gray-200 
-                       hover:border-blue-500 hover:shadow-md 
+                       hover:border-teal-500 hover:shadow-md 
                        transition-all text-left"
           >
             <h2 className="text-lg font-semibold text-gray-900">
