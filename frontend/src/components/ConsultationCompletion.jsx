@@ -72,46 +72,63 @@ useEffect(() => {
 
   
 
-const fetchRecommendations = async () => {
-  setLoadingRecommendations(true);
-  try {
-    const res = await fetch(`http://localhost:5001/recommendations/medicine?` +
-      `&age=${patient.age}` +
-      `&gender=${patient.gender}` +
-      `&diagnosis=${encodeURIComponent(formData.diagnosis)}` +
-      `&severity=${formData.severity}` +
-      `&patient_id=${patient.patient_id}`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-
-    if (!res.ok) throw new Error("Failed to fetch recommendations");
-
-    const data = await res.json();
-    setRecommendations(data.recommendations || []);
-  } catch (err) {
-    console.error("Recommendation fetch error:", err);
-    setRecommendations([]);
-  } finally {
-    setLoadingRecommendations(false);
-  }
-};
-
-  const deletePrescription = async (prescriptionId) => {
+  const fetchRecommendations = async () => {
+    setLoadingRecommendations(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/prescriptions/${prescriptionId}`, {
-        method: "DELETE",
+      const weight = Number(patient.weight);
+      const safeWeight = isNaN(weight) || weight <= 0 ? 65 : weight;
+
+      // 🔥 FIXED GENDER FORMAT
+      const formattedGender = patient.gender
+        ? patient.gender.trim().toLowerCase()
+        : "";
+
+      const res = await fetch("http://localhost:5001/recommendations/medicine", {
+        method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({
+          age: Number(patient.age),
+          weight: safeWeight,
+          gender: formattedGender,
+          diagnosis: formData.diagnosis?.trim().toLowerCase() || "",
+          severity: formData.severity?.trim().toLowerCase() || "",
+          patient_id: patient.patient_id
+        })
       });
-      if (!res.ok) throw new Error("Failed to delete prescription");
-    } catch (error) {
-      console.error("Delete prescription error:", error);
+
+      if (!res.ok) {
+        const errorText = await res.text(); // 🔎 helpful for debugging
+        console.error("Backend error:", errorText);
+        throw new Error("Failed to fetch recommendations");
+      }
+
+      const data = await res.json();
+      setRecommendations(data.recommendations || []);
+
+    } catch (err) {
+      console.error("Recommendation fetch error:", err);
+      setRecommendations([]);
+    } finally {
+      setLoadingRecommendations(false);
     }
   };
+
+  const deletePrescription = async (prescriptionId) => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/prescriptions/${prescriptionId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error("Failed to delete prescription");
+      } catch (error) {
+        console.error("Delete prescription error:", error);
+      }
+    };
 
 
 
@@ -184,106 +201,112 @@ const fetchRecommendations = async () => {
       quantity: m.quantity
     }))
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSaving(true);
+  console.log("FULL prescribedMedicines:", prescribedMedicines);
 
-  const handleSubmit = async (e) => {
+  const cleanedMedicines = prescribedMedicines.filter(
+    m => m.medicine_id && m.name && m.name.trim() !== "" &&
 
+    m.name.trim() !== "" &&
+    m.dosage &&
+    m.frequency &&
+    m.duration &&
+    m.quantity
+  );
 
-      e.preventDefault();
-      setSaving(true);
+  if (cleanedMedicines.length === 0) {
+    setShowMedicineError(true);
+    setTimeout(() => setShowMedicineError(false), 3000);
+    setSaving(false);
 
-      // Remove empty/incomplete medicine rows before submit
-      const cleanedMedicines = prescribedMedicines.filter(m => m.medicine_id && m.name && m.name.trim() !== "");
-      if (cleanedMedicines.length === 0) {
-        setShowMedicineError(true);
-        setTimeout(() => setShowMedicineError(false), 3000);
-        setSaving(false);
-        // Highlight incomplete rows
-        setIncompleteRows(prescribedMedicines.map(m => (!m.medicine_id || !m.name || m.name.trim() === "") ? m.id : null).filter(Boolean));
-        return;
-      } else {
-        setIncompleteRows([]);
-      }
-      // Update state so preview shows only valid medicines
-      setPrescribedMedicines(cleanedMedicines);
+    setIncompleteRows(
+      prescribedMedicines
+        .filter(m => !m.medicine_id || !m.name || m.name.trim() === "")
+        .map(m => m.id)
+    );
+    return;
+  }
 
+  setIncompleteRows([]);
 
-    try {
-      const summaryRes = await fetch("http://localhost:5000/clinical-summaries", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          convo_id,
-          subjective: editableSummary,
-          objective: editableSummary,
-          assessment: editableSummary,
-          plan: editableSummary,
-        }),
-      });
+  try {
+    // 1️⃣ Save clinical summary
+    const summaryRes = await fetch("http://localhost:5000/clinical-summaries", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        convo_id,
+        subjective: editableSummary,
+        objective: editableSummary,
+        assessment: editableSummary,
+        plan: editableSummary,
+      }),
+    });
 
-      if (!summaryRes.ok) throw new Error("Failed to save clinical summary");
-      const summaryData = await summaryRes.json();
-      const summary_id = summaryData.summary_id;
+    if (!summaryRes.ok) throw new Error("Failed to save clinical summary");
+    const summaryData = await summaryRes.json();
+    const summary_id = summaryData.summary_id;
 
+    // 2️⃣ Save diagnosis
+    const diagnosisRes = await fetch("http://localhost:5000/diagnosis", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        summary_id,
+        diagnosis: formData.diagnosis,
+      }),
+    });
 
+    if (!diagnosisRes.ok) throw new Error("Failed to save diagnosis");
 
-      const diagnosisRes = await fetch("http://localhost:5000/diagnosis", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          summary_id,
-          diagnosis: formData.diagnosis,
-        }),
-      });
+    // 3️⃣ Save prescription
+    const prescriptionRes = await fetch("http://localhost:5000/api/prescriptions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        doctor_id: doctor.user_id,
+        patient_id: patient.patient_id,
+        medicines: cleanedMedicines.map(m => ({
+          medicine_id: m.medicine_id,
+          name: m.name,
+          dosage: m.dosage,
+          frequency: m.frequency,
+          duration: m.duration,
+          quantity: m.quantity
+        }))
+      }),
+    });
 
-
-      if (!diagnosisRes.ok) throw new Error("Failed to save diagnosis");
-
-            const prescriptionRes = await fetch("http://localhost:5000/api/prescriptions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          doctor_id: doctor.user_id,
-          patient_id: patient.patient_id,
-          medicines: cleanedMedicines.map(m => ({
-            medicine_id: m.medicine_id,
-            name: m.name,
-            dosage: m.dosage,
-            frequency: m.frequency,
-            duration: m.duration,
-            quantity: m.quantity
-          }))
-        }),
-      });
-
-      if (!prescriptionRes.ok) {
-        const errorData = await prescriptionRes.json().catch(() => ({}));
-        console.error("Prescription API error:", errorData);
-        throw new Error("Failed to save prescription");
-      }
-
-      const prescriptionData = await prescriptionRes.json();
-      setSavedPrescriptionId(prescriptionData.prescription_id);
-
-      setSaving(false);
-      setShowSuccess(true);
-      setShowPreview(true);
-
-    } catch (error) {
-      console.error("CONSULTATION SAVE ERROR:", error);
-      setSaving(false);
-      alert("Failed to save consultation data");
+    if (!prescriptionRes.ok) {
+      const errorData = await prescriptionRes.json().catch(() => ({}));
+      console.error("Prescription API error:", errorData);
+      throw new Error("Failed to save prescription");
     }
-  
-}
+
+    const prescriptionData = await prescriptionRes.json();
+    setSavedPrescriptionId(prescriptionData.prescription_id);
+
+    setShowSuccess(true);
+    setShowPreview(true);
+
+  } catch (error) {
+    console.error("CONSULTATION SAVE ERROR:", error);
+    alert("Failed to save consultation data");
+  } finally {
+    setSaving(false);
+  }
+};
   return (
     
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -476,7 +499,10 @@ const fetchRecommendations = async () => {
               {/* Recommended Medicines */}
               <div className="space-y-3">
                 {recommendations.map((rec, index) => {
-                  const isAdded = prescribedMedicines.some(med => med.medicine_id === rec.medicine_id);
+                  console.log("Recommendation object:", rec);
+                 const isAdded = prescribedMedicines.some(
+                          med => med.name === rec.medicine_name
+                        );
                   
                   return (
                     <div key={index} className="bg-white rounded-lg p-4 border border-purple-200 hover:shadow-lg transition-shadow">
@@ -488,12 +514,7 @@ const fetchRecommendations = async () => {
                             </span>
                             <h3 className="font-bold text-lg text-gray-800">{rec.medicine_name}</h3>
                             
-                            {isAdded && (
-                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center">
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Added
-                              </span>
-                            )}
+                            
                           </div>
                           
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-2">
@@ -519,33 +540,62 @@ const fetchRecommendations = async () => {
                           )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isAdded) {
-                             
-                              setPrescribedMedicines(prescribedMedicines.filter(m => m.medicine_id !== rec.medicine_id));
-                            } else {
-                            
-                              const newMed = {
-                                id: Date.now() + index,
-                                name: rec.medicine_name,
-                                dosage: rec.dosage || "1 tablet",
-                                frequency: rec.frequency || "1-0-1",
-                                duration: rec.duration || "5 days",
-                                quantity: rec.quantity || 1,
+                        
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(
+                                  `http://localhost:5000/diagnosis/search?query=${rec.medicine_name}`,
+                                  { headers: { Authorization: `Bearer ${token}` } }
+                                );
+
+                                if (!res.ok) throw new Error("Search failed");
+                                
+                                
+                                const data = await res.json();
+                                console.log("SEARCH RESPONSE:", data);
+
+                                let matchedMedicine = null;
+
+                                if (data.available && Array.isArray(data.medicines)) {
+                                  matchedMedicine =
+                                    data.medicines.find(
+                                      m => m.name.toLowerCase() === rec.medicine_name.toLowerCase()
+                                    ) || data.medicines[0];
+                                } else if (Array.isArray(data.alternatives)) {
+                                  matchedMedicine = data.alternatives[0];
+                                }
+
+                                if (!matchedMedicine) {
+                                  alert("Medicine not found in hospital pharmacy.");
+                                  return;
+                                }
+
+                                const newMed = {
+                                  id: Date.now() + index,
+                                  medicine_id: matchedMedicine.medicine_id,
+                                  name: matchedMedicine.name,
+                                  dosage: "1 tablet",
+                                  frequency: "1-0-1",
+                                  duration: "5 days",
+                                  quantity: 1,
                                 };
-                              setPrescribedMedicines([...prescribedMedicines, newMed]);
-                            }
-                          }}
-                          className={`ml-4 px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap ${
-                            isAdded 
-                              ? 'bg-red-600 hover:bg-red-700 text-white' 
-                              : 'bg-purple-600 hover:bg-purple-700 text-white'
-                          }`}
-                        >
-                          {isAdded ? '- Remove' : '+ Add'}
-                        </button>
+
+                                setPrescribedMedicines(prev => [...prev, newMed]);
+
+                              } catch (err) {
+                                console.error("Failed to fetch medicine ID:", err);
+                              }
+                            }}
+                            className={`ml-4 px-4 py-2 rounded-lg text-sm font-medium ${
+                              isAdded
+                                ? "bg-purple-600 hover:bg-purple-700 text-white"
+                                : "bg-purple-600 hover:bg-purple-700 text-white"
+                            }`}
+                          >
+                            {isAdded ? "Add" : "Add"}
+                          </button>
                       </div>
                     </div>
                   );
@@ -592,7 +642,7 @@ const fetchRecommendations = async () => {
 
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-semibold text-teal-700 text-sm">Medicine {index + 1}</span>
-                  {prescribedMedicines.length > 1 && (
+                  
                     <button
                       type="button"
                       onClick={() => handleRemove(med.id)}
@@ -600,7 +650,7 @@ const fetchRecommendations = async () => {
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                  )}
+                  
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -788,22 +838,39 @@ const fetchRecommendations = async () => {
             <button 
               type="button" 
               onClick={async () => {
-                if (!savedPrescriptionId) return;
-                if (window.confirm("Are you sure you want to delete this prescription? ")) {
-                  try {
-                    await fetch(`http://localhost:5000/api/prescriptions/${savedPrescriptionId}`, {
-                      method: "DELETE",
-                      headers: { Authorization: `Bearer ${token}` }
-                    });
-                    setSavedPrescriptionId(null);
-                    setShowPreview(false);
-                    setShowDeleteSuccess(true);
-                    setTimeout(() => setShowDeleteSuccess(false), 2500);
-                  } catch (err) {
-                    console.error("Failed to delete prescription on cancel", err);
-                  }
-                }
-              }}
+  try {
+    const res = await fetch(
+      `http://localhost:5000/diagnosis/search?query=${encodeURIComponent(rec.medicine_name)}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!res.ok) throw new Error("Search failed");
+
+    const data = await res.json();
+
+    if (data.available && data.medicines.length > 0) {
+      const found = data.medicines[0];
+
+      const newMed = {
+        id: Date.now(),
+        medicine_id: found.medicine_id,   // ✅ REAL ID FROM DB
+        name: found.name,
+        dosage: rec.dosage || "1 tablet",
+        frequency: rec.frequency || "1-0-1",
+        duration: rec.duration || "5 days",
+        quantity: rec.quantity || 1,
+      };
+
+      setPrescribedMedicines(prev => [...prev, newMed]);
+
+    } else {
+      alert("Medicine not found in hospital database.");
+    }
+
+  } catch (err) {
+    console.error("Failed to fetch medicine ID:", err);
+  }
+}}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
             >
               Cancel

@@ -5,6 +5,32 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import { encryptDiagnosis, decryptDiagnosis } from "../utils/aes.js";
 
 const router = express.Router();
+const getMedicineId = async (medicineName) => {
+  if (!medicineName) return null;
+
+  const cleanedName = medicineName
+  .trim()
+  .replace(/\s+/g, " ")
+  .replace(/[–—]/g, "-"); // normalize dashes
+
+  const { data, error } = await supabase
+    .from("medicine")
+    .select("medicine_id, name")
+    .ilike("name", cleanedName)
+    .limit(1);
+
+  if (error) {
+    console.error("Medicine search error:", error);
+    return null;
+  }
+
+  if (!data || data.length === 0) {
+    console.log("No match found for:", `"${cleanedName}"`);
+    return null;
+  }
+
+  return data[0].medicine_id;
+};
 
 router.post("/", authMiddleware, async (req, res) => {
   try {
@@ -45,16 +71,19 @@ router.post("/", authMiddleware, async (req, res) => {
 
 //search medicines
 router.get("/search", authMiddleware, async (req, res) => {
+    
   try {
     const { query } = req.query;
 
     if (!query) {
       return res.status(400).json({ error: "Search query required" });
     }
-
+    
     // 1️⃣ Check availability anywhere
     const { data: available, error: availError } = await supabase
       .rpc("check_medicine_availability", { search_name: query });
+
+    
 
     if (availError) throw availError;
 
