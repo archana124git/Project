@@ -48,42 +48,42 @@ export default function ManageDoctors() {
   }, [navigate]);
 
   // Delete doctor
-const handleDeleteDoctor = async (doctorUserId) => {
-  if (!window.confirm("Are you sure you want to delete this doctor?")) return;
+  const handleDeleteDoctor = async (doctorUserId) => {
+    if (!window.confirm("Are you sure you want to delete this doctor?")) return;
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Unauthorized. Please login again.");
-    navigate("/login");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/doctors/${doctorUserId}`, {
-  method: "DELETE",
-  headers: { Authorization: `Bearer ${token}` },
-});
-
-    let data;
-    const contentType = res.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      data = await res.json();
-    } else {
-      data = { error: `Unexpected server response (${res.status})` };
-    }
-
-    if (!res.ok) {
-      alert("Error deleting doctor: " + (data.error || "Unknown error"));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Unauthorized. Please login again.");
+      navigate("/login");
       return;
     }
 
-    alert("Doctor deleted successfully");
-    setDoctors((prev) => prev.filter((d) => d.user_id !== doctorUserId));
-  } catch (err) {
-    console.error("Delete doctor error:", err);
-    alert("Failed to delete doctor.");
-  }
-};
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/doctors/${doctorUserId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      let data;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        data = { error: `Unexpected server response (${res.status})` };
+      }
+
+      if (!res.ok) {
+        alert("Error deleting doctor: " + (data.error || "Unknown error"));
+        return;
+      }
+
+      alert("Doctor deleted successfully");
+      setDoctors((prev) => prev.filter((d) => d.user_id !== doctorUserId));
+    } catch (err) {
+      console.error("Delete doctor error:", err);
+      alert("Failed to delete doctor.");
+    }
+  };
 
 
   if (loading) return <div className="p-6">Loading doctors...</div>;
@@ -97,13 +97,13 @@ const handleDeleteDoctor = async (doctorUserId) => {
         <div className="p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-blue-900">
+            <h1 className="text-3xl font-bold text-teal-700">
               Manage Doctors
             </h1>
 
             <button
               onClick={() => navigate("/add-doctor")}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2 rounded-lg"
             >
               Add Doctor
             </button>
@@ -113,7 +113,7 @@ const handleDeleteDoctor = async (doctorUserId) => {
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
               <thead>
-                <tr className="bg-[#c7cfee] text-left">
+                <tr className="bg-teal-100 text-left">
                   <th className="p-3">ID</th>
                   <th className="p-3">Name</th>
                   <th className="p-3">Specialization</th>
@@ -132,15 +132,15 @@ const handleDeleteDoctor = async (doctorUserId) => {
                 ) : (
                   doctors.map((doc) => (
                     <tr key={doc.user_id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 text-blue-900">{doc.user_id}</td>
-                      <td className="p-3 text-blue-900">{doc.name}</td>
-                      <td className="p-3 text-blue-900">{doc.specialization || "General"}</td>
-                      <td className="p-3 text-blue-900">{doc.license_number || "-"}</td>
+                      <td className="p-3 text-teal-700">{doc.user_id}</td>
+                      <td className="p-3 text-teal-700">{doc.name}</td>
+                      <td className="p-3 text-teal-700">{doc.specialization || "General"}</td>
+                      <td className="p-3 text-teal-700">{doc.license_number || "-"}</td>
 
                       <td className="p-3 text-center space-x-2">
                         <button
                           onClick={() => navigate(`/doctor-profile/${doc.user_id}`)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                          className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-3 py-1 rounded"
                         >
                           View
                         </button>

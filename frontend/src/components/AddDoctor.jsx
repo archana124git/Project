@@ -24,45 +24,45 @@ export default function AddDoctor() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  try {
-    console.log("POST /doctors/add HIT");
-    const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/doctors/add`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
+    try {
+      console.log("POST /doctors/add HIT");
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/doctors/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || data.error);
+        return;
       }
-    );
 
-    const data = await res.json();
+      alert("Doctor added successfully");
 
-    if (!res.ok) {
-      alert(data.message || data.error);
-      return;
-    }
-
-    alert("Doctor added successfully");
-
-    // ✅ Log the action to audit_log
-    /*await logActivity("ADD_DOCTOR", {
+      // ✅ Log the action to audit_log
+      /*await logActivity("ADD_DOCTOR", {
       doctorId: data.doctor.user_id,
       doctorName: data.doctor.name,
       specialization: data.doctor.specialization,
     });*/
 
-    navigate("/manage-doctors");
-  } catch (err) {
-    console.error("Error adding doctor:", err);
-  }
-};
+      navigate("/manage-doctors");
+    } catch (err) {
+      console.error("Error adding doctor:", err);
+    }
+  };
 
 
   return (
@@ -71,7 +71,7 @@ export default function AddDoctor() {
       <div className="flex-1 bg-[#f9f9f9] min-h-screen">
         <Navbar />
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6 text-blue-900">Add Doctor</h1>
+          <h1 className="text-3xl font-bold mb-6 text-teal-700">Add Doctor</h1>
 
           <form
             onSubmit={handleSubmit}
@@ -88,7 +88,7 @@ export default function AddDoctor() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Name"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -102,7 +102,7 @@ export default function AddDoctor() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -116,7 +116,7 @@ export default function AddDoctor() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter your phone number"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -130,7 +130,7 @@ export default function AddDoctor() {
                 value={formData.education}
                 onChange={handleChange}
                 placeholder="MBBS"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -144,7 +144,7 @@ export default function AddDoctor() {
                 value={formData.license_number}
                 onChange={handleChange}
                 placeholder=""
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -158,7 +158,7 @@ export default function AddDoctor() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter a secure password"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -172,7 +172,7 @@ export default function AddDoctor() {
                 value={formData.specialization}
                 onChange={handleChange}
                 placeholder="Neurology"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 required
               />
             </div>
@@ -193,7 +193,7 @@ export default function AddDoctor() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-900 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg transition-colors"
             >
               {loading ? "Adding Doctor..." : "Add Doctor"}
             </button>

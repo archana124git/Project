@@ -23,6 +23,7 @@ export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const [patient, setPatient] = useState(null);
+  const [bloodGroup, setBloodGroup] = useState("N/A");
   const [allDoctors, setAllDoctors] = useState([]);
   const [specializations, setSpecializations] = useState([]);
   const [selectedSpec, setSelectedSpec] = useState("");
@@ -74,10 +75,11 @@ const currentHour = now.getHours();
     async function fetchPatient() {
       const { data } = await supabase
         .from("patients")
-        .select("patient_id, name, age, gender, contact")
+        .select("patient_id, name, age, gender, contact, Blood_group")
         .eq("patient_id", patientId)
         .single();
       setPatient(data);
+      setBloodGroup(data?.Blood_group || "N/A");
     }
     if (patientId) fetchPatient();
   }, [patientId]);
@@ -217,11 +219,16 @@ if (date === todayString) {
   }
 await fetchSlotStatus();
   alert(`Appointment booked successfully!\nYour Token Number is ${tokenNumber}`);
-    await fetchAppointments();
 
-  setDate("");
-  setTime("");
-  setSelectedDoctor(null);
+
+// Clear booking states
+setDate("");
+setTime("");
+setSelectedDoctor(null);
+setSelectedSpec("");
+
+// Switch back to dashboard view (this hides booking UI)
+setActiveTab("dashboard");
 };
 
   const handleLogout = () => {
@@ -625,6 +632,12 @@ await fetchSlotStatus();
                       <span className="text-sm text-gray-500">Contact</span>
                       <span className="text-sm font-medium text-teal-700">
                         {patient.contact}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Blood Group</span>
+                      <span className="text-sm font-medium text-teal-700">
+                        {bloodGroup}
                       </span>
                     </div>
                   </div>

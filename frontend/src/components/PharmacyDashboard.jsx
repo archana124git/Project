@@ -203,18 +203,21 @@ export default function PharmacyDashboard() {
     p.patient_id.toString().includes(searchText)
   );
 
+<<<<<<< HEAD
   const lowStockCount = inventory.filter(i => i.quantity < 10).length;
+=======
+>>>>>>> 6d0e9d1 (Updated ui and doctor dashboard booked label added)
   const patientsCount = prescriptions.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* HEADER */}
-      <header className="bg-white border-b shadow-sm">
+      <header className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between">
-          <h1 className="text-2xl font-bold text-blue-900">
+          <h1 className="text-2xl font-bold text-white">
             Pharmacy Dashboard
           </h1>
-          <button onClick={handleLogout} className="flex items-center text-red-600">
+          <button onClick={handleLogout} className="flex items-center text-white hover:text-white/90">
             <LogOut size={18} />
             <span className="ml-2">Logout</span>
           </button>
@@ -223,8 +226,7 @@ export default function PharmacyDashboard() {
 
       {/* STATS */}
       <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-3 gap-6">
-        <StatCard title="Total Medicines" value={inventory.length} icon={<Package />} />
-        <StatCard title="Low Stock" value={lowStockCount} icon={<AlertCircle />} />
+  
         <StatCard title="Patients" value={patientsCount} icon={<ClipboardList />} />
       </div>
 
@@ -237,13 +239,13 @@ export default function PharmacyDashboard() {
               placeholder="Search by Patient ID"
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
-              className="border px-3 py-2 rounded w-1/3"
+              className="border px-3 py-2 rounded w-1/3 focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
             <input
               type="date"
               value={selectedDate}
               onChange={e => setSelectedDate(e.target.value)}
-              className="border px-3 py-2 rounded w-1/3"
+              className="border px-3 py-2 rounded w-1/3 focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
 
@@ -251,7 +253,7 @@ export default function PharmacyDashboard() {
             <p>Loading...</p>
           ) : (
             <table className="w-full border">
-              <thead className="bg-gray-100">
+              <thead className="bg-teal-100">
                 <tr>
                   <th className="border px-4 py-2">Patient ID</th>
                   <th className="border px-4 py-2">Diagnosis</th>
@@ -270,14 +272,14 @@ export default function PharmacyDashboard() {
 
                     <td className="border px-4 py-2">
                       {p.insurance_type ? (
-                        <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm font-semibold">
+                        <span className="bg-teal-100 text-teal-700 px-2 py-1 rounded text-sm font-semibold">
                           {p.insurance_type}
                         </span>
                       ) : (
                         <div>
                           <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">No Insurance</span>
                           <div className="text-xs text-gray-400 mt-1">
-                            raw: {p.patient_raw?.insurance_type ?? "(missing)"}
+                            {p.patient_raw?.insurance_type ?? "(missing)"}
                           </div>
                         </div>
                       )}
@@ -285,7 +287,7 @@ export default function PharmacyDashboard() {
 
                     <td className="border px-4 py-2">
                       {p.insurance_status === "Active" && (
-                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-semibold">
+                        <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-sm font-semibold">
                           Active
                         </span>
                       )}
@@ -298,7 +300,7 @@ export default function PharmacyDashboard() {
                         <div>
                           <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">N/A</span>
                           <div className="text-xs text-gray-400 mt-1">
-                            raw: {p.patient_raw?.insurance_status ?? "(missing)"}
+                             {p.patient_raw?.insurance_status ?? "(missing)"}
                           </div>
                         </div>
                       )}
@@ -331,10 +333,10 @@ export default function PharmacyDashboard() {
 function StatCard({ title, value, icon }) {
   return (
     <div className="bg-white p-5 rounded shadow flex items-center space-x-4">
-      <div className="p-3 bg-gray-100 rounded-full">{icon}</div>
+      <div className="p-3 bg-teal-50 rounded-full text-teal-600">{icon}</div>
       <div>
         <p className="text-sm text-gray-500">{title}</p>
-        <p className="text-xl font-bold">{value}</p>
+        <p className="text-xl font-bold text-teal-700">{value}</p>
       </div>
     </div>
   );

@@ -34,4 +34,3 @@ app.use("/diagnosis", diagnosisRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
 
 export default app;
-

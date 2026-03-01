@@ -44,12 +44,12 @@ export default function Dashboard() {
         <Navbar />
 
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6 text-blue-900">
+          <h1 className="text-3xl font-bold mb-6 text-teal-700">
             Dashboard
           </h1>
 
           {loading ? (
-            <p className="text-blue-900">Loading dashboard data...</p>
+            <p className="text-teal-700">Loading dashboard data...</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <StatCard title="Doctors" value={stats.doctors} />
@@ -65,7 +65,7 @@ export default function Dashboard() {
 
 function StatCard({ title, value }) {
   return (
-    <div className="bg-white p-6 rounded shadow text-blue-900">
+    <div className="bg-white p-6 rounded shadow text-teal-700">
       <h2 className="text-lg font-semibold">{title}</h2>
       <p className="text-3xl font-bold mt-2">{value}</p>
     </div>
