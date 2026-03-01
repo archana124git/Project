@@ -203,10 +203,6 @@ export default function PharmacyDashboard() {
     p.patient_id.toString().includes(searchText)
   );
 
-<<<<<<< HEAD
-  const lowStockCount = inventory.filter(i => i.quantity < 10).length;
-=======
->>>>>>> 6d0e9d1 (Updated ui and doctor dashboard booked label added)
   const patientsCount = prescriptions.length;
 
   return (
@@ -226,7 +222,7 @@ export default function PharmacyDashboard() {
 
       {/* STATS */}
       <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-3 gap-6">
-  
+         
         <StatCard title="Patients" value={patientsCount} icon={<ClipboardList />} />
       </div>
 
