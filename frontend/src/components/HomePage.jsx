@@ -41,7 +41,8 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen relative flex bg-white">
+    
+      <div className="h-screen relative flex bg-white overflow-hidden">
 
       {/* ── Left Hero Panel ── */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 p-12 relative overflow-hidden">
@@ -98,40 +99,12 @@ function HomePage() {
               </p>
             </div>
 
-            {/* Feature list */}
-            <div className="space-y-4 pt-6">
-              {[
-                "Real-time Voice Recognition",
-                "AI-Generated Medical Notes",
-                "Digital Prescription System",
-              ].map((feature) => (
-                <div key={feature} className="flex items-center gap-3 text-white">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/30">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-lg font-medium">{feature}</span>
-                </div>
-              ))}
-            </div>
+            
+            
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-white/20">
-            <div>
-              <div className="text-3xl font-bold text-white">5000+</div>
-              <div className="text-sm text-white/80">Active Users</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white">99.8%</div>
-              <div className="text-sm text-white/80">Accuracy</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white">24/7</div>
-              <div className="text-sm text-white/80">Support</div>
-            </div>
-          </div>
+          
+          
         </div>
       </div>
 

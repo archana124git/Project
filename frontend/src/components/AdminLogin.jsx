@@ -15,10 +15,10 @@ export default function Login() {
   
     try {
       const res = await fetch("http://localhost:5000/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: userId, password }),
-  });
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, password }),
+      });
   
   
       const data = await res.json();
@@ -36,12 +36,12 @@ export default function Login() {
   
       // Navigate based on user role
       if (role.toLowerCase() === "doctor") {
-      navigate("/dashboard", { replace: true });
-    } else if (role.toLowerCase() === "admin") {
-      navigate("/admin-dashboard", { replace: true });
-    } else {
-      navigate("/", { replace: true });
-    } // fallback
+        navigate("/dashboard", { replace: true });
+      } else if (role.toLowerCase() === "admin") {
+        navigate("/admin-dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      } // fallback
     } catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please try again.");
@@ -52,7 +52,7 @@ export default function Login() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9F8F7]">
       {/* Welcome Heading */}
-      <h1 className="text-4xl font-bold text-blue-900 mb-8 text-center">
+      <h1 className="text-4xl font-bold text-teal-700 mb-8 text-center">
         Welcome to MediScript
       </h1>
 
@@ -70,7 +70,7 @@ export default function Login() {
             placeholder="Username"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
         </div>
 
@@ -81,7 +81,7 @@ export default function Login() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
           <button
             type="button"
@@ -96,18 +96,21 @@ export default function Login() {
         {/* Forgot Password */}
         <div className="text-right mb-6">
           <Link
-                  to="/forgot-pwd" className="text-sm text-gray-700 hover:text-gray-900">Forgot password?</Link>
-
+            to="/forgot-pwd"
+            className="text-sm text-teal-600 hover:text-teal-700"
+          >
+            Forgot password?
+          </Link>
         </div>
 
         {/* Login Button */}
         <button
           type="submit"
-          className="w-full bg-blue-900 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg transition-colors"
         >
           Login
         </button>
       </form>
     </div>
   );
-}    
+}

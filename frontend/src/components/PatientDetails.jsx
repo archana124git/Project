@@ -24,6 +24,7 @@ export default function PatientDetails() {
   const [loadingDiag, setLoadingDiag] = useState(true);
   const [showAllDiagnosis, setShowAllDiagnosis] = useState(false);
   const [showAllMedication, setShowAllMedication] = useState(false);
+  const [bloodGroup, setBloodGroup] = useState("N/A");
 
   // ===================== START LISTENING =====================
   const startListening = () => {
@@ -37,6 +38,7 @@ export default function PatientDetails() {
           age: displayAge,
           gender: displayGender,
           contact: displayContact,
+          
         },
       },
     });
@@ -134,6 +136,26 @@ export default function PatientDetails() {
     if (displayId) fetchDiagnosisHistory();
   }, [displayId]);
 
+// ===================== BLOOD GROUP (SUPABASE) =====================
+useEffect(() => {
+  async function fetchBloodGroup() {
+    const { data, error } = await supabase
+      .from("patients")
+      .select("Blood_group")   // capital B
+      .eq("patient_id", displayId)
+      .single();
+
+    if (error) {
+      console.error("Blood group fetch error:", error.message);
+      setBloodGroup("N/A");
+    } else {
+      setBloodGroup(data?.Blood_group || "N/A");
+    }
+  }
+
+  if (displayId) fetchBloodGroup();
+}, [displayId]);
+
   // ===================== DIAGNOSIS DISPLAY LOGIC =====================
   const displayedDiagnosis = showAllDiagnosis
     ? diagnosisHistory
@@ -146,7 +168,6 @@ export default function PatientDetails() {
   // ===================== UI =====================
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* ── HEADER ── */}
       <header className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -155,15 +176,12 @@ export default function PatientDetails() {
               <User className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">
-                Patient Details
-              </h1>
+              <h1 className="text-xl font-bold text-white">Patient Details</h1>
               <p className="text-sm text-white/80">
                 ID: <span className="font-semibold text-white">{displayId}</span>
               </p>
             </div>
           </div>
-
           <div className="flex items-center space-x-2">
             <button
               onClick={() => navigate(-1)}
@@ -182,9 +200,7 @@ export default function PatientDetails() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-4 py-8">
-
         {/* ── PATIENT INFO CARD ── */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md mb-6">
           <div className="flex items-center gap-4 mb-4">
@@ -196,7 +212,7 @@ export default function PatientDetails() {
               <p className="text-sm text-teal-600">Patient ID: {displayId}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Age</p>
               <p className="text-gray-800 font-medium mt-1">{displayAge}</p>
@@ -209,19 +225,20 @@ export default function PatientDetails() {
               <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Contact</p>
               <p className="text-gray-800 font-medium mt-1">{displayContact}</p>
             </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Blood Group</p>
+              <p className="text-gray-800 font-medium mt-1">{bloodGroup}</p>
+            </div>
           </div>
         </div>
-
         {/* ── DIAGNOSIS & MEDICATION HISTORY SIDE BY SIDE ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
           {/* DIAGNOSIS HISTORY */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
             <h2 className="text-lg font-bold text-teal-700 mb-4 flex items-center gap-2">
               <span className="w-2 h-5 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full inline-block"></span>
               Diagnosis History
             </h2>
-
             {loadingDiag ? (
               <p className="text-gray-400 text-sm">Loading diagnosis...</p>
             ) : diagnosisHistory.length === 0 ? (
@@ -241,7 +258,6 @@ export default function PatientDetails() {
                     </p>
                   </div>
                 ))}
-
                 {diagnosisHistory.length > 3 && (
                   <button
                     onClick={() => setShowAllDiagnosis(!showAllDiagnosis)}
@@ -255,14 +271,12 @@ export default function PatientDetails() {
               </>
             )}
           </div>
-
           {/* MEDICATION HISTORY */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md">
             <h2 className="text-lg font-bold text-teal-700 mb-4 flex items-center gap-2">
               <span className="w-2 h-5 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full inline-block"></span>
               Past Medication History
             </h2>
-
             {loadingMeds ? (
               <p className="text-gray-400 text-sm">Loading medications...</p>
             ) : medHistory.length === 0 ? (
@@ -289,7 +303,6 @@ export default function PatientDetails() {
                     </ul>
                   </div>
                 ))}
-
                 {medHistory.length > 3 && (
                   <button
                     onClick={() => setShowAllMedication(!showAllMedication)}

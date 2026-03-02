@@ -4,6 +4,8 @@ import axios from "axios";
 
 import DoctorDropdown from "./DropDown";
 import DoctorProfile from "./DoctorProfile";
+import { getBookedPatients } from '../utils/appointments';
+import supabase from "../supabaseClient";
 
 import {
   Calendar,
@@ -24,14 +26,22 @@ export default function DoctorDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [todayPatientIds, setTodayPatientIds] = useState([]);
 
-  // Stats placeholder
-  const [stats] = useState({
-    total_appointments_today: 8,
-    completed_appointments: 0,
-    pending_appointments: 0,
-    in_progress_appointments: 0,
-  });
+  // Calculate completed and pending visits for today and this doctor
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  // Completed: patients who booked for today and completed
+  const completedVisits = patients.filter(
+    p => p.doctor_id === doctorProfile?.user_id && p.appointment_date === todayStr && p.visit_status === 'completed'
+  ).length;
+  // Pending: patients who booked for today and not completed
+  const pendingVisits = patients.filter(
+    p => p.doctor_id === doctorProfile?.user_id && p.appointment_date === todayStr && p.visit_status === 'booked'
+  ).length;
 
   /* ------------------------------------------------
       1️⃣ Attach token to ALL axios requests
@@ -60,11 +70,34 @@ export default function DoctorDashboard() {
         navigate("/");
       });
   }, []);
+  /* -----------------------------------------
+   Fetch Today's Booked from Supabase
+----------------------------------------- */
+useEffect(() => {
+  if (!doctorProfile) return;
 
-  /* ------------------------------------------------
-      3️⃣ Fetch patients list
-  --------------------------------------------------*/
-  useEffect(() => {
+  async function fetchTodaysBooked() {
+    const todayISO = new Date().toISOString().split("T")[0];
+
+    const { data, error } = await supabase
+      .from("appointments")
+      .select("patient_id")
+      .eq("doctor_id", doctorProfile.user_id)
+      .eq("appointment_date", todayISO);
+
+    if (error) {
+      console.error("Error fetching booked appointments:", error);
+      return;
+    }
+
+    setTodayPatientIds((data || []).map((a) => a.patient_id));
+  }
+
+  fetchTodaysBooked();
+}, [doctorProfile]);
+
+  // Fetch patients list (reusable)
+  const fetchPatients = () => {
     axios
       .get("http://127.0.0.1:5000/patients")
       .then((res) => {
@@ -73,6 +106,19 @@ export default function DoctorDashboard() {
       .catch((err) => {
         console.error("Error fetching patients:", err);
       });
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  // Poll for updates every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPatients();
+    }, 10000); // 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
   /* ------------------------------------------------
@@ -167,8 +213,9 @@ export default function DoctorDashboard() {
               <div>
                 <p className="text-sm text-gray-500">Completed</p>
                 <p className="text-3xl text-emerald-600 mt-2">
-                  {stats.completed_appointments}
+                  {completedVisits}
                 </p>
+                <p className="text-xs text-gray-400 mt-1">Patients completed visit</p>
               </div>
               <div className="bg-emerald-50 p-3 rounded-full">
                 <CheckCircle className="w-8 h-8 text-emerald-600" />
@@ -176,29 +223,16 @@ export default function DoctorDashboard() {
             </div>
           </div>
 
-          {/* In Progress */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm text-gray-500">In Progress</p>
-                <p className="text-3xl text-cyan-600 mt-2">
-                  {stats.in_progress_appointments}
-                </p>
-              </div>
-              <div className="bg-cyan-50 p-3 rounded-full">
-                <Activity className="w-8 h-8 text-cyan-600" />
-              </div>
-            </div>
-          </div>
-
+      
           {/* Pending */}
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-gray-500">Pending</p>
                 <p className="text-3xl text-gray-600 mt-2">
-                  {stats.pending_appointments}
+                  {pendingVisits}
                 </p>
+                <p className="text-xs text-gray-400 mt-1">Patients waiting to visit</p>
               </div>
               <div className="bg-gray-100 p-3 rounded-full">
                 <Clock className="w-8 h-8 text-gray-500" />
@@ -245,50 +279,60 @@ export default function DoctorDashboard() {
                   No patients found.
                 </p>
               ) : (
-                filteredPatients.map((patient) => (
-                  <div
-                    key={patient.patient_id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-teal-300 transition-all duration-200"
-                  >
-                    <div className="flex justify-between">
-                      <div>
-                        <h3 className="font-semibold text-teal-800 text-lg">
-                          {patient.name}
-                        </h3>
-                        <p className="text-sm text-teal-600">
-                          ID: {patient.patient_id}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 text-right">
-                        <button
-                          onClick={() =>
-                            navigate(`/patient/${patient.patient_id}`, {
-                              state: { patient, doctorProfile },
-                            })
-                          }
-                          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full"
-                        >
-                          View Details
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            navigate("/listening", {
-                              state: {
-                                doctor: doctorProfile,
-                                patient: patient,
-                              },
-                            })
-                          }
-                          className="px-3 py-1 border-2 border-teal-500 text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-all duration-200 block w-full"
-                        >
-                          Start Listening
-                        </button>
+                filteredPatients.map((patient) => {
+                  const today = new Date();
+                  const yyyy = today.getFullYear();
+                  const mm = String(today.getMonth() + 1).padStart(2, '0');
+                  const dd = String(today.getDate()).padStart(2, '0');
+                  const todayStr = `${yyyy}-${mm}-${dd}`;
+                  // Check if patient has booked appointment for this doctor today
+                  const isBooked = todayPatientIds.includes(patient.patient_id);
+                  return (
+                    <div
+                      key={patient.patient_id}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-teal-300 transition-all duration-200"
+                    >
+                      <div className="flex justify-between">
+                        <div>
+                          <h3 className="font-semibold text-teal-800 text-lg">
+                            {patient.name}
+                          </h3>
+                          <p className="text-sm text-teal-600">
+                            ID: {patient.patient_id}
+                          </p>
+                          {isBooked && (
+                            <p className="text-xs text-cyan-700 mt-1 font-semibold">Booked</p>
+                          )}
+                        </div>
+                        <div className="space-y-2 text-right">
+                          <button
+                            onClick={() =>
+                              navigate(`/patient/${patient.patient_id}`, {
+                                state: { patient, doctorProfile },
+                              })
+                            }
+                            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md block w-full"
+                          >
+                            View Details
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate("/listening", {
+                                state: {
+                                  doctor: doctorProfile,
+                                  patient: patient,
+                                },
+                              })
+                            }
+                            className="px-3 py-1 border-2 border-teal-500 text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-all duration-200 block w-full"
+                          >
+                            Start Listening
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -344,4 +388,4 @@ export default function DoctorDashboard() {
       />
     </div>
   );
-}
+}  
