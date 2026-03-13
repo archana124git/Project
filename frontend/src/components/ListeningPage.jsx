@@ -112,7 +112,7 @@ export default function ListeningPage() {
 
             <div>
               <h1 className="text-xl font-bold text-white">
-                Voice Typing Mode (Win + H to start)
+                Voice Typing Mode 
               </h1>
 
               {patient && (
@@ -132,13 +132,7 @@ export default function ListeningPage() {
       {/* ── Main ── */}
       <main className="max-w-4xl mx-auto px-4 py-8">
 
-        {/* Instruction Banner */}
-        <div className="flex items-center gap-3 bg-teal-50 border border-teal-200 rounded-lg px-4 py-3 mb-5">
-          <AlertCircle className="w-5 h-5 text-teal-600 flex-shrink-0" />
-          <span className="text-teal-700 font-medium text-sm">
-            Press <kbd className="px-2 py-0.5 bg-white border border-teal-300 rounded text-xs font-bold text-teal-700 shadow-sm">Win + H</kbd> and start speaking to begin dictation
-          </span>
-        </div>
+       
 
         {/* Transcript Card */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-md p-6 mb-5">

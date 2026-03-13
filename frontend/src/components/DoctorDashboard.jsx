@@ -81,7 +81,7 @@ useEffect(() => {
 
     const { data, error } = await supabase
       .from("appointments")
-      .select("patient_id")
+      .select("patient_id,session")
       .eq("doctor_id", doctorProfile.user_id)
       .eq("appointment_date", todayISO);
 
@@ -90,7 +90,7 @@ useEffect(() => {
       return;
     }
 
-    setTodayPatientIds((data || []).map((a) => a.patient_id));
+    setTodayPatientIds(data || []);
   }
 
   fetchTodaysBooked();
@@ -132,14 +132,38 @@ useEffect(() => {
   /* ------------------------------------------------
       5️⃣ Search filter
   --------------------------------------------------*/
+  // Session time control
+const now = new Date();
+const currentHour = now.getHours();
+
+const activeBookings = todayPatientIds.filter((a) => {
+  if (a.session === "FN" && currentHour < 12) return true;
+  if (a.session === "AN" && currentHour < 18) return true;
+  return false;
+});
   const normalizedSearch = searchTerm.trim().toLowerCase();
-  const filteredPatients = normalizedSearch
+  const filteredPatients = (
+  normalizedSearch
     ? patients.filter((p) => {
         const name = (p?.name || "").toLowerCase();
         const id = (p?.patient_id || "").toLowerCase();
         return name.includes(normalizedSearch) || id.includes(normalizedSearch);
       })
-    : patients;
+    : patients
+).sort((a, b) => {
+  const aBooked = activeBookings.some(
+  (p) => p.patient_id === a.patient_id
+);
+
+const bBooked = activeBookings.some(
+  (p) => p.patient_id === b.patient_id
+);
+
+  // Booked patients first
+  if (aBooked && !bBooked) return -1;
+  if (!aBooked && bBooked) return 1;
+  return 0;
+});
 
   if (loading) {
     return (
@@ -286,11 +310,17 @@ useEffect(() => {
                   const dd = String(today.getDate()).padStart(2, '0');
                   const todayStr = `${yyyy}-${mm}-${dd}`;
                   // Check if patient has booked appointment for this doctor today
-                  const isBooked = todayPatientIds.includes(patient.patient_id);
+                 const isBooked = activeBookings.some(
+  (p) => p.patient_id === patient.patient_id
+);
                   return (
                     <div
                       key={patient.patient_id}
-                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-teal-300 transition-all duration-200"
+                      className={`border rounded-lg p-4 transition-all duration-200 ${
+  isBooked
+    ? "border-emerald-300 bg-emerald-50 hover:shadow-md"
+    : "border-gray-200 hover:shadow-md hover:border-teal-300"
+}`}
                     >
                       <div className="flex justify-between">
                         <div>
@@ -383,9 +413,9 @@ useEffect(() => {
 
       <DoctorProfile
         doctorProfile={doctorProfile}
-        isOpen={isProfileOpen}
+        isOpen={isProfileOpen}  
         onClose={() => setIsProfileOpen(false)}
       />
     </div>
   );
-}  
+}

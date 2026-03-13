@@ -173,6 +173,7 @@ useEffect(() => {
         frequency: "1-0-1",
         duration: "3 days",
         quantity: 1,
+        before_meal:"after"
       }
     ]);
   };
@@ -368,7 +369,7 @@ const handleSubmit = async (e) => {
             <div className="space-y-2 text-gray-700">
               <p><span className="font-semibold">ID:</span> {patient.patient_id}</p>
               <p><span className="font-semibold">Name:</span> {patient.name}</p>
-              <p><span className="font-semibold">Consultation #:</span> {convo_number}</p>
+              <p><span className="font-semibold">Consultation:</span> {convo_number}</p>
               <p><span className="font-semibold">Blood Group:</span> {patient.blood_group}</p>
               <p><span className="font-semibold">Allergies:</span> {patient.allergies?.join(", ") || "None"}</p>
             </div>
@@ -551,19 +552,22 @@ const handleSubmit = async (e) => {
                                 );
 
                                 if (!res.ok) throw new Error("Search failed");
-                                
-                                
+
                                 const data = await res.json();
                                 console.log("SEARCH RESPONSE:", data);
 
                                 let matchedMedicine = null;
 
-                                if (data.available && Array.isArray(data.medicines)) {
+                                // Case 1: Available medicines
+                                if (Array.isArray(data?.medicines) && data.medicines.length > 0) {
                                   matchedMedicine =
                                     data.medicines.find(
                                       m => m.name.toLowerCase() === rec.medicine_name.toLowerCase()
                                     ) || data.medicines[0];
-                                } else if (Array.isArray(data.alternatives)) {
+                                }
+
+                                // Case 2: Alternatives
+                                if (!matchedMedicine && Array.isArray(data?.alternatives) && data.alternatives.length > 0) {
                                   matchedMedicine = data.alternatives[0];
                                 }
 
@@ -572,14 +576,25 @@ const handleSubmit = async (e) => {
                                   return;
                                 }
 
+                                // ✅ Prevent duplicates
+                                const alreadyExists = prescribedMedicines.some(
+                                  med => med.medicine_id === matchedMedicine.medicine_id
+                                );
+
+                                if (alreadyExists) {
+                                  alert("Medicine already added.");
+                                  return;
+                                }
+
                                 const newMed = {
-                                  id: Date.now() + index,
+                                  id: Date.now() + Math.random(),
                                   medicine_id: matchedMedicine.medicine_id,
                                   name: matchedMedicine.name,
-                                  dosage: "1 tablet",
-                                  frequency: "1-0-1",
-                                  duration: "5 days",
-                                  quantity: 1,
+                                  dosage: rec.dosage || "1 tablet",
+                                  frequency: rec.frequency || "1-0-1",
+                                  duration: rec.duration || "5 days",
+                                  quantity: rec.quantity || 1,
+                                  before_meal: med.before_meal
                                 };
 
                                 setPrescribedMedicines(prev => [...prev, newMed]);
@@ -826,6 +841,48 @@ const handleSubmit = async (e) => {
                       <option key={i + 1} value={i + 1}>{i + 1}</option>
                     ))}
                   </select>
+
+                  
+                  {/* Before / After Meal Toggle */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-gray-600"> Time:</span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPrescribedMedicines(prev =>
+                          prev.map(x =>
+                            x.id === med.id ? { ...x, before_meal: "before" } : x
+                          )
+                        )
+                      }
+                      className={`px-3 py-1 rounded-lg border ${
+                        med.before_meal === "before"
+                          ? "bg-teal-500 text-white border-teal-500"
+                          : "bg-white text-gray-600 border-gray-200"
+                      }`}
+                    >
+                      Before Food
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPrescribedMedicines(prev =>
+                          prev.map(x =>
+                            x.id === med.id ? { ...x, before_meal: "after" } : x
+                          )
+                        )
+                      }
+                      className={`px-3 py-1 rounded-lg border ${
+                        med.before_meal === "after"
+                          ? "bg-teal-500 text-white border-teal-500"
+                          : "bg-white text-gray-600 border-gray-200"
+                      }`}
+                    >
+                      After Food
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -836,53 +893,50 @@ const handleSubmit = async (e) => {
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
             <button 
-              type="button" 
+              type="button"
               onClick={async () => {
-  try {
-    const res = await fetch(
-      `http://localhost:5000/diagnosis/search?query=${encodeURIComponent(rec.medicine_name)}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+                if (!savedPrescriptionId) {
+                  alert("No saved prescription to delete.");
+                  return;
+                }
 
-    if (!res.ok) throw new Error("Search failed");
+                try {
+                  const res = await fetch(
+                    `http://localhost:5000/api/prescriptions/${savedPrescriptionId}`,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                    }
+                  );
 
-    const data = await res.json();
+                  if (!res.ok) throw new Error("Failed to delete prescription");
 
-    if (data.available && data.medicines.length > 0) {
-      const found = data.medicines[0];
+                  setShowDeleteSuccess(true);
+                  setTimeout(() => setShowDeleteSuccess(false), 3000);
 
-      const newMed = {
-        id: Date.now(),
-        medicine_id: found.medicine_id,   // ✅ REAL ID FROM DB
-        name: found.name,
-        dosage: rec.dosage || "1 tablet",
-        frequency: rec.frequency || "1-0-1",
-        duration: rec.duration || "5 days",
-        quantity: rec.quantity || 1,
-      };
+                  setSavedPrescriptionId(null);
+                  setShowPreview(false);
+                  setPrescribedMedicines([]);
 
-      setPrescribedMedicines(prev => [...prev, newMed]);
-
-    } else {
-      alert("Medicine not found in hospital database.");
-    }
-
-  } catch (err) {
-    console.error("Failed to fetch medicine ID:", err);
-  }
-}}
+                } catch (error) {
+                  console.error("Delete prescription error:", error);
+                  alert("Failed to delete prescription");
+                }
+              }}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
             >
               Cancel
             </button>
 
-      {/* Delete success popup */}
-      {showDeleteSuccess && (
-        <div className="fixed top-24 right-6 bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center space-x-3 animate-slide-in z-50">
-          <Trash2 className="w-6 h-6" />
-          <span className="font-medium">Prescription deleted successfully.</span>
-        </div>
-      )}
+              {/* Delete success popup */}
+              {showDeleteSuccess && (
+                <div className="fixed top-24 right-6 bg-red-500 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center space-x-3 animate-slide-in z-50">
+                  <Trash2 className="w-6 h-6" />
+                  <span className="font-medium">Prescription deleted successfully.</span>
+                </div>
+              )}
 
             <button 
               type="submit"

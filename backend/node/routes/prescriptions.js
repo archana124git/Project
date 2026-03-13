@@ -18,13 +18,7 @@ router.post("/", authMiddleware, async (req, res) => {
     if (!doctor_id || !patient_id || !medicines?.length) {
       return res.status(400).json({ error: "Missing data" });
     }
-    const medicineId = await getMedicineId(predictedMedicine);
-
-      if (!medicineId) {
-        return res.status(404).json({
-          message: "Medicine not found in database"
-        });
-      }
+    
 
     // Validate that all medicines have required fields
     const invalidMedicines = medicines.filter(m => !m.medicine_id || !m.dosage || !m.frequency || !m.duration);

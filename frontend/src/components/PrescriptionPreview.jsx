@@ -35,6 +35,7 @@ return (
           <th className="border p-2">Frequency</th>
           <th className="border p-2">Duration</th>
           <th className="border p-2">Qty</th>
+          <th className="border p-2">Before Meal</th>
         </tr>
       </thead>
       <tbody>
@@ -46,6 +47,13 @@ return (
             <td className="border p-2">{m.frequency}</td>
             <td className="border p-2">{m.duration}</td>
             <td className="border p-2 text-center">{m.quantity}</td>
+            <td className="border p-2 text-center">
+              {m.before_meal === "before"
+                ? "Before Food"
+                : m.before_meal === "after"
+                ? "After Food"
+                : "-"}
+            </td>
           </tr>
         ))}
       </tbody>
