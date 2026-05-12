@@ -19,7 +19,6 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Missing data" });
     }
     
-
     // Validate that all medicines have required fields
     const invalidMedicines = medicines.filter(m => !m.medicine_id || !m.dosage || !m.frequency || !m.duration);
     if (invalidMedicines.length > 0) {
@@ -160,6 +159,102 @@ router.delete("/:prescriptionId", authMiddleware, async (req, res) => {
 
   } catch (err) {
     console.error("DELETE PRESCRIPTION ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/* ============================================================================
+   DISPATCH PRESCRIPTION + DEDUCT MEDICINE STOCK
+============================================================================ */
+router.put("/:id/dispatch", authMiddleware, async (req, res) => {
+  try {
+
+    // Only pharmacist allowed
+    if (req.user.role.toLowerCase() !== "pharmacist") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const { id } = req.params;
+
+    // Get prescription medicines
+    const { data: prescriptionMeds, error: medFetchError } = await supabase
+      .from("prescription_medicine")
+      .select(`
+        medicine_id,
+        duration,
+        medicine (
+          medicine_id,
+          name,
+          quantity
+        )
+      `)
+      .eq("prescription_id", id);
+
+    if (medFetchError) {
+      console.error(medFetchError);
+      return res.status(500).json({ error: "Failed to fetch medicines" });
+    }
+
+    if (!prescriptionMeds || prescriptionMeds.length === 0) {
+      return res.status(404).json({ error: "No medicines found" });
+    }
+
+    // Deduct stock
+    for (const item of prescriptionMeds) {
+
+      const med = item.medicine;
+
+      // Example deduction logic
+      // 1 day duration = 1 quantity deduction
+      const deductQty = parseInt(item.duration) || 1;
+
+      const currentQty = med.quantity || 0;
+
+      if (currentQty < deductQty) {
+        return res.status(400).json({
+          error: `${med.name} does not have enough stock`
+        });
+      }
+
+      const newQty = currentQty - deductQty;
+
+      const { error: updateError } = await supabase
+        .from("medicine")
+        .update({
+          quantity: newQty
+        })
+        .eq("medicine_id", med.medicine_id);
+
+      if (updateError) {
+        console.error(updateError);
+        return res.status(500).json({
+          error: `Failed to update stock for ${med.name}`
+        });
+      }
+    }
+
+    // Update prescription dispatch status
+    const { error: dispatchError } = await supabase
+      .from("prescriptions")
+      .update({
+        dispatch_status: "dispatched",
+        dispatched_at: new Date().toISOString()
+      })
+      .eq("prescription_id", id);
+
+    if (dispatchError) {
+      console.error(dispatchError);
+      return res.status(500).json({
+        error: "Failed to update dispatch status"
+      });
+    }
+
+    res.json({
+      message: "Prescription dispatched successfully"
+    });
+
+  } catch (err) {
+    console.error("DISPATCH ERROR:", err);
     res.status(500).json({ error: "Server error" });
   }
 });

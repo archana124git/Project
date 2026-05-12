@@ -57,13 +57,13 @@ function PatientLogin() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg mb-4 shadow-md">
-            <span className="text-white font-semibold text-lg">AP</span>
+            <span className="text-white font-semibold text-lg">PA</span>
           </div>
           <h1 className="text-2xl font-semibold text-gray-900">
             Patient Access Portal
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Andhra Pradesh Health Management System
+           
           </p>
         </div>
 
@@ -132,7 +132,7 @@ function PatientLogin() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
-            This system is developed as part of an academic project under AP State Health Services.
+            This system is developed as part of an academic project.
           </p>
         </div>
 

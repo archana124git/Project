@@ -13,16 +13,14 @@ function PatientAccess() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center 
                           w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-md mb-4">
-            <span className="text-white font-semibold text-lg">AP</span>
+            <span className="text-white font-semibold text-lg">PA</span>
           </div>
 
           <h1 className="text-2xl font-semibold text-gray-900">
             Patient Access Portal
           </h1>
 
-          <p className="text-sm text-gray-600 mt-1">
-            Andhra Pradesh Digital Health System
-          </p>
+          
         </div>
 
         {/* Card */}

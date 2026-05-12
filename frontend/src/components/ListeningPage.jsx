@@ -8,9 +8,7 @@ export default function ListeningPage() {
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const { doctor, patient } = location.state || {};
-
   const [transcript, setTranscript] = useState("");
 
   const summarizeTranscript = async () => {
@@ -45,12 +43,11 @@ export default function ListeningPage() {
   const saveConversationAndNavigate = async () => {
     const token = localStorage.getItem("token");
 
-    // 1️⃣ Create conversation
     const convoRes = await fetch("http://localhost:5000/conversations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         patient_id: patient.patient_id,
@@ -60,7 +57,7 @@ export default function ListeningPage() {
     const convoData = await convoRes.json();
     const { convo_id, convo_number } = convoData;
 
-    // 2️⃣ Save transcript
+    
     await fetch("http://localhost:5000/transcripts", {
       method: "POST",
       headers: {
@@ -74,7 +71,7 @@ export default function ListeningPage() {
       }),
     });
 
-    // 3️⃣ Navigate to completion page
+ 
     navigate("/consultation", {
       state: {
         convo_id,
@@ -87,16 +84,6 @@ export default function ListeningPage() {
     });
   };
 
-  /*const goToConsultation = () => {
-  navigate("/consultation", {
-    state: {
-      transcript,
-      summary,   // ✅ PASS SUMMARY
-      doctor,
-      patient
-    }
-  });
-};*/
 
   return (
     <div className="min-h-screen bg-gray-50">

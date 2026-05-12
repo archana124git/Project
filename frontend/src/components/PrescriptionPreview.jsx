@@ -29,7 +29,7 @@ return (
     <table className="w-full border-collapse border text-sm">
       <thead>
         <tr className="bg-gray-100">
-          <th className="border p-2">#</th>
+          <th className="border p-2">SI</th>
           <th className="border p-2">Medicine</th>
           <th className="border p-2">Dosage</th>
           <th className="border p-2">Frequency</th>
@@ -48,11 +48,13 @@ return (
             <td className="border p-2">{m.duration}</td>
             <td className="border p-2 text-center">{m.quantity}</td>
             <td className="border p-2 text-center">
-              {m.before_meal === "before"
-                ? "Before Food"
-                : m.before_meal === "after"
-                ? "After Food"
-                : "-"}
+              {m?.before_meal
+                ? m.before_meal === "before"
+                  ? "Before Food"
+                  : m.before_meal === "after"
+                  ? "After Food"
+                  : m.before_meal
+                : "Not specified"}
             </td>
           </tr>
         ))}

@@ -16,5 +16,10 @@
     "url": "https://github.com/archana124git/Project/issues"
   },
   "homepage": "https://github.com/archana124git/Project#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "date": "^2.0.6",
+    "picker": "^0.1.4",
+    "react": "^19.2.6"
+  }
 }

@@ -10,10 +10,6 @@ import supabase from "../supabaseClient";
 import {
   Calendar,
   User,
-  Clock,
-  CheckCircle,
-  Activity,
-  FileText,
   Search,
 } from "lucide-react";
 
@@ -34,14 +30,6 @@ export default function DoctorDashboard() {
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
   const todayStr = `${yyyy}-${mm}-${dd}`;
-  // Completed: patients who booked for today and completed
-  const completedVisits = patients.filter(
-    p => p.doctor_id === doctorProfile?.user_id && p.appointment_date === todayStr && p.visit_status === 'completed'
-  ).length;
-  // Pending: patients who booked for today and not completed
-  const pendingVisits = patients.filter(
-    p => p.doctor_id === doctorProfile?.user_id && p.appointment_date === todayStr && p.visit_status === 'booked'
-  ).length;
 
   /* ------------------------------------------------
       1️⃣ Attach token to ALL axios requests
@@ -151,13 +139,8 @@ const activeBookings = todayPatientIds.filter((a) => {
       })
     : patients
 ).sort((a, b) => {
-  const aBooked = activeBookings.some(
-  (p) => p.patient_id === a.patient_id
-);
-
-const bBooked = activeBookings.some(
-  (p) => p.patient_id === b.patient_id
-);
+  const aBooked = activeBookings.some((p) => p.patient_id === a.patient_id);
+  const bBooked = activeBookings.some((p) => p.patient_id === b.patient_id);
 
   // Booked patients first
   if (aBooked && !bBooked) return -1;
@@ -213,63 +196,60 @@ const bBooked = activeBookings.some(
       {/* ── Main ── */}
       <main className="max-w-7xl mx-auto px-4 py-8">
 
-        {/* ── Stats ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-
-          {/* Total Patients */}
+        {/* ── Doctor Profile ── */}
+        <div className="grid grid-cols-1 mb-8">
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex justify-between">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <p className="text-sm text-gray-500">Total Patients</p>
-                <p className="text-3xl font-bold text-teal-700 mt-2">
-                  {patients.length}
+                <h2 className="text-xl font-bold text-teal-700 flex items-center">
+                  <User className="w-6 h-6 mr-2 text-teal-600" />
+                  Doctor Profile
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Quick summary of your profile and contact details.
                 </p>
               </div>
-              <div className="bg-teal-50 p-3 rounded-full">
-                <Calendar className="w-8 h-8 text-teal-600" />
+              <div className="flex items-center space-x-3">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-800">{doctorProfile.name}</p>
+                  <p className="text-sm text-gray-500">{doctorProfile.specialization || "Specialization not set"}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Completed */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Completed</p>
-                <p className="text-3xl text-emerald-600 mt-2">
-                  {completedVisits}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">Patients completed visit</p>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-gray-500">License</p>
+                  <p className="font-medium text-teal-600">{doctorProfile.license_number || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Email</p>
+                  <p className="font-medium text-teal-600">{doctorProfile.email || "Not provided"}</p>
+                </div>
               </div>
-              <div className="bg-emerald-50 p-3 rounded-full">
-                <CheckCircle className="w-8 h-8 text-emerald-600" />
-              </div>
-            </div>
-          </div>
-
-      
-          {/* Pending */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Pending</p>
-                <p className="text-3xl text-gray-600 mt-2">
-                  {pendingVisits}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">Patients waiting to visit</p>
-              </div>
-              <div className="bg-gray-100 p-3 rounded-full">
-                <Clock className="w-8 h-8 text-gray-500" />
+              <div className="space-y-3">
+                <div>
+                  <p className="text-gray-500">Phone</p>
+                  <p className="font-medium text-teal-600">{doctorProfile.phone || "Not provided"}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Doctor ID</p>
+                  <p className="font-medium text-teal-600">{doctorProfile.user_id || "-"}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* ── Patients Section ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6">
 
           {/* Patients List */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
             <div className="flex justify-between mb-6">
               <div>
                 <h2 className="text-xl font-bold text-teal-700 flex items-center">
@@ -316,11 +296,12 @@ const bBooked = activeBookings.some(
                   return (
                     <div
                       key={patient.patient_id}
-                      className={`border rounded-lg p-4 transition-all duration-200 ${
-  isBooked
-    ? "border-emerald-300 bg-emerald-50 hover:shadow-md"
-    : "border-gray-200 hover:shadow-md hover:border-teal-300"
-}`}
+                      className={
+                        "border rounded-lg p-4 transition-all duration-200 " +
+                        (isBooked
+                          ? "border-emerald-300 bg-emerald-50 hover:shadow-md"
+                          : "border-gray-200 hover:shadow-md hover:border-teal-300")
+                      }
                     >
                       <div className="flex justify-between">
                         <div>
@@ -364,47 +345,6 @@ const bBooked = activeBookings.some(
                   );
                 })
               )}
-            </div>
-          </div>
-
-          {/* ── Right Side Profile ── */}
-          <div className="space-y-6">
-            <div className="bg-white border border-gray-200 rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-teal-700 flex items-center">
-                <User className="w-6 h-6 mr-2 text-teal-600" />
-                Your Profile
-              </h2>
-
-              <div className="flex items-center mt-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-md">
-                  <User className="w-8 h-8 text-white" />
-                </div>
-
-                <div className="ml-4">
-                  <h3 className="font-semibold text-gray-800 text-lg">
-                    {doctorProfile.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {doctorProfile.specialization}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 border-t border-gray-100 pt-3">
-                <p className="text-sm">
-                  <span className="text-gray-500">License:</span>{" "}
-                  <span className="font-medium text-teal-600">
-                    {doctorProfile.license_number}
-                  </span>
-                </p>
-              </div>
-
-              <button
-                onClick={() => setIsProfileOpen(true)}
-                className="w-full mt-4 border-2 border-teal-500 text-teal-600 hover:bg-teal-50 py-2 rounded-lg font-medium transition-all duration-200"
-              >
-                View Full Profile
-              </button>
             </div>
           </div>
 

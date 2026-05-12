@@ -1,11 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
 from summarizer import summarize_to_crt
 from medicine_recommend.routes import medicine_bp
 
 app = Flask(__name__)
-
 CORS(
     app,
     resources={r"/*": {"origins": "http://localhost:5173"}},
@@ -33,8 +31,7 @@ def summarize():
 
     except Exception as e:
         return jsonify({"error": "Internal server error"}), 500
-    
-    
+
 
 
 if __name__ == "__main__":
